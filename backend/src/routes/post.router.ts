@@ -12,6 +12,6 @@ router.post('/',validaterequest(postValidation),tokenVerify,postController);
 router.get('/',tokenVerify,getallPostController);
 router.get('/user',tokenVerify,getuserpost);
 router.get('/post/:id',tokenVerify,getpostbyid)
-// "/post/:id"
+
 
 export default router;

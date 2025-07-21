@@ -6,6 +6,7 @@ import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
 
 
 
+
 export const postController = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const { title, content, id } = req.body;
     const userid = (req as any).user_id;
@@ -46,14 +47,72 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
         if (!allpost) {
             return res.status(404).json({ success: false, message: 'Post not found' })
         }
-        const allpost_data = allpost.map(post => ({
-            id: post.id,
-            title: post.title,
-            content: post.content,
-            user_id: post.user_id,
-            subreddit_id: post.subreddit_id,
-            username: post.author.username,
-            subreddit_name: post.subreddit?.name
+        const allpost_data = await Promise.all(allpost.map(async post => {
+            const vote_post = await prisma.postVote.aggregate({
+                where: { post_id: post.id },
+                _sum: {
+                    vote_type: true
+                }
+            });
+            const comments = await prisma.comment.findMany({
+                where: { post_id: post.id },
+                include: {
+                    author: {
+                        select: {
+                            username: true
+                        }
+                    }
+                }
+            });
+            const commentObj = new Map<string, any>();
+            comments.forEach(comment => {
+                commentObj.set(comment.id, {
+                    id: comment.id,
+                    content: comment.content,
+                    created_at: comment.created_at,
+                    parent_comment_id: comment.parent_comment_id,
+                    user_id: comment.user_id,
+                    post_id: comment.post_id,
+                    username: comment.author.username,
+                    replies: [],
+                    commentVote: 0
+
+                });
+            });
+            const root: any[] = [];
+            for (const comment of comments) {
+                const currentcomment = commentObj.get(comment.id);
+                
+                    if(comment.parent_comment_id){
+                        const parentcomment = commentObj.get(comment.parent_comment_id);
+                        if(parentcomment){
+                            parentcomment.replies.push(currentcomment);
+                        }
+                    }else{
+                        root.push(currentcomment)
+                    }
+                    const commentvote = await prisma.commentVote.aggregate({
+                        where: { comment_id: comment.id },
+                        _sum: {
+                            vote_type: true
+                        }
+                    })
+                    currentcomment.commentVote = commentvote._sum.vote_type || 0;
+                
+            }
+
+            return {
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                user_id: post.user_id,
+                subreddit_id: post.subreddit_id,
+                username: post.author.username,
+                subreddit_name: post.subreddit?.name,
+                votes: vote_post._sum.vote_type || 0,
+                comment:root
+
+            }
         }))
         return res.status(200).json({ success: true, message: 'Post found', data: allpost_data })
 
@@ -74,18 +133,74 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                     }
                 }
             }
-        })
+        });
+
         if (!userpost) {
             return res.status(404).json({ success: false, message: "User post not found" })
         }
 
-        const userpost_data = userpost.map(post => ({
-            id: post.id,
-            title: post.title,
-            content: post.content,
-            user_id: post.user_id,
-            subreddit_id: post.subreddit_id,
-            username: post.author.username
+        const userpost_data = await Promise.all(userpost.map(async post => {
+            const vote_post = await prisma.postVote.aggregate({
+                where: { post_id: post.id },
+                _sum: {
+                    vote_type: true
+                }
+            });
+            const comments = await prisma.comment.findMany({
+                where: { post_id: post.id }, orderBy: { created_at: "asc" },
+                include: {
+                    author: {
+                        select: {
+                            username: true
+                        }
+                    }
+                }
+            });
+            const commentObj = new Map<string, any>();
+            comments.forEach((comment) => {
+                commentObj.set(comment.id, {
+                    id: comment.id,
+                    content: comment.content,
+                    created_at: comment.created_at,
+                    parent_comment_id: comment.parent_comment_id,
+                    user_id: comment.user_id,
+                    post_id: comment.post_id,
+                    username: comment.author.username,
+                    replies: [],
+                    commentVote: 0
+                });
+            })
+            const root: any[] = [];
+            for (const comment of comments) {
+                const currentcomment = commentObj.get(comment.id);
+                if (comment.parent_comment_id) {
+                    const parentcomment = commentObj.get(comment.parent_comment_id);
+                    if (parentcomment) {
+                        parentcomment.replies.push(currentcomment);
+
+                    }
+
+                } else {
+                    root.push(currentcomment);
+                }
+                const comment_vote = await prisma.commentVote.aggregate({
+                    where: { comment_id: comment.id },
+                    _sum: {
+                        vote_type: true
+                    }
+                })
+                currentcomment.commentVote = comment_vote._sum.vote_type || 0;
+            }
+            return {
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                user_id: post.user_id,
+                subreddit_id: post.subreddit_id,
+                username: post.author.username,
+                votes: vote_post._sum.vote_type || 0,
+                comment: root
+            }
         }))
         return res.status(200).json({ success: true, message: "User post found", data: userpost_data })
     } catch (error: any) {
@@ -93,6 +208,7 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
     }
 }
 
+//COMPLETED
 export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const post_id = req.params.id;
     try {
@@ -114,27 +230,64 @@ export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<P
         if (!post) {
             return res.status(404).json({ success: false, message: "Post not found" })
         }
-        const comments = await prisma.comment.findMany({ where: { post_id }, orderBy: { created_at: "asc" } });
+        const vote_post = await prisma.postVote.aggregate({
+            where: { post_id: post_id },
+            _sum: {
+                vote_type: true
+            }
+        })
+        const comments = await prisma.comment.findMany({
+            where: { post_id }, orderBy: { created_at: "asc" },
+            include: {
+                author: {
+                    select: {
+                        username: true
+                    }
+                }
+            }
+        });
         const commentObj = new Map<string, any>();
         comments.forEach((comment) => {
-            commentObj.set(comment.id, { ...comment, replies: [] });
+            commentObj.set(comment.id, {
+                id: comment.id,
+                content: comment.content,
+                created_at: comment.created_at,
+                parent_comment_id: comment.parent_comment_id,
+                user_id: comment.user_id,
+                post_id: comment.post_id,
+                username: comment.author.username,
+                replies: [],
+                commentVote: 0
+            });
         })
         const root: any[] = [];
-        comments.forEach((comment) => {
+        for (const comment of comments) {
             const currentcomment = commentObj.get(comment.id);
             if (comment.parent_comment_id) {
                 const parentcomment = commentObj.get(comment.parent_comment_id);
                 if (parentcomment) {
                     parentcomment.replies.push(currentcomment);
+
                 }
+
             } else {
                 root.push(currentcomment);
             }
-        })
+            const comment_vote = await prisma.commentVote.aggregate({
+                where: { comment_id: comment.id },
+                _sum: {
+                    vote_type: true
+                }
+            })
+            currentcomment.commentVote = comment_vote._sum.vote_type || 0;
+        }
+        
         return res.status(200).json({
             success: true, message: "Post found",
             data: {
-                title: post.title, username: post.author.username, name: post.subreddit?.name ?? null, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id, comment: root
+                title: post.title, username: post.author.username, name: post.subreddit?.name ?? null, content: post.content,
+                user_id: post.user_id, subreddit_id: post.subreddit_id, comment: root, votepost: vote_post._sum.vote_type,
+
             }
         });
     } catch (error: any) {

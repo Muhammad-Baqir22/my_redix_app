@@ -27,6 +27,8 @@ model User {
   postVotes     PostVote[]
   commentVotes  CommentVote[]
   userSubs   UserSubs[] @relation("UserFollowedSubreddits")
+  userfollow  Userfollow[] @relation("UserFollowsUser")
+  followtouser  Userfollow[] @relation("FollowedToUser")
 }
 
 model Subreddit {
@@ -103,4 +105,17 @@ model UserSubs {
   subreddit  Subreddit @relation("SubredditFollowers", fields: [subs_id], references: [id])
 
   @@unique([followed_by_id, subs_id])
+}
+
+model Userfollow{
+  followed_by_id String
+  user_id String
+  created_at DateTime @default(now())
+
+  followby   User      @relation("UserFollowsUser", fields: [followed_by_id], references: [id])
+  user        User      @relation("FollowedToUser", fields: [user_id], references:[id])
+  
+
+  @@unique([followed_by_id,user_id])
+
 }

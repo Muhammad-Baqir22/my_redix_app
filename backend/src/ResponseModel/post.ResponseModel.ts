@@ -6,5 +6,7 @@ export interface Post {
   content?: string | null;
   user_id: string;
   subreddit_id?: string | null;
-  comment?: comment[] | null
+  comment?: comment[] | null;
+  votepost?: number|null;
+  commentvote?:number|null
 };

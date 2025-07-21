@@ -49,14 +49,6 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                 }
             })
         }
-        // const sumvote = await prisma.postVote.aggregate({
-        //         where: {
-        //             post_id
-        //         },
-        //         _sum: {
-        //             vote_type: true
-        //         }
-        //     })
         return res.status(200).json({ success: true, message: "Vote added successfully" })
     } catch (error: any) {
         return res.status(500).json({ success: false, message: error.message })
