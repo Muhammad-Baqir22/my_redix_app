@@ -16,7 +16,7 @@ export const followcontroller = async (req: Request, res: Response) => {
     }
   });
   if (check) {
-    res.json({ success: false, message: "User already follow the subs" })
+    return res.json({ success: false, message: "User already follow the subs" })
   }
   const subredditExists = await prisma.subreddit.findUnique({
     where: {
@@ -44,12 +44,13 @@ export const followcontroller = async (req: Request, res: Response) => {
     include: {
       creator: {
         select: {
+          id: true,
           fcm_token: true
         }
       }
     }
   })
-  
+
   const follower = await prisma.user.findUnique({
     where: {
       id: followed_by_id
@@ -70,8 +71,16 @@ export const followcontroller = async (req: Request, res: Response) => {
     } catch (error: any) {
       console.log('Error sending message:', error);
     }
+    await prisma.notification.create({
+      data: {
+        user_id: sub_userid.creator.id,
+        type: 'follow',
+        message: `${follower?.username} Started Following You`,
+        Read: false
+      }
+    })
   }
-  res.json({ success: true, message: 'followed', data: subreddit })
+  return res.json({ success: true, message: 'followed', data: subreddit })
 
 
 }
