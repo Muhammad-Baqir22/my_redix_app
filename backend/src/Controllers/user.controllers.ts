@@ -35,7 +35,7 @@ export const createUser = async (req: Request, res: Response) : Promise<any> => 
 };
 
 export const loginController = async (req: Request, res: TypedResponse<ApiResponse<AuthResponse>>) : Promise<any> => {
-    const { email, password } = req.body;
+    const { email, password,fcm_token } = req.body;
 
     try {
         const user = await prisma.user.findUnique({
@@ -48,6 +48,16 @@ export const loginController = async (req: Request, res: TypedResponse<ApiRespon
         if (!passMatch)
             res.status(401).json({success: false , message : "Incorrect Password"});
         const token = Jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '2d' })
+        if(fcm_token){
+            await prisma.user.update({
+                where:{
+                    email
+                },
+                data:{
+                    fcm_token
+                }
+            })
+        }
         return res.status(200).json({success: true, message: "Login successFull", data:{user: { id: user.id,username:user.username, email: user.email },token} });
     } catch (error:any) {
         res.status(500).json({ 

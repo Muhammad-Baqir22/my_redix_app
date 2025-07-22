@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import prisma from '../db/prismaclient.js'
 import { TypedResponse } from '../types/typedResponse.js';
 import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
-import {Vote} from '../ResponseModel/vote.ResponseModel.js'
+import { Vote } from '../ResponseModel/vote.ResponseModel.js'
+import admin from '../firebase.js'
 
 export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote>>): Promise<any> => {
     const { vote_type, post_id } = req.body;
@@ -13,7 +14,7 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                 user_id_post_id: {
                     user_id,
                     post_id
-                }
+                } 
             }
         })
         if (existingVote) {
@@ -26,6 +27,7 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                         }
                     }
                 })
+                return res.status(200).json({ success: true, message: "Vote delete successfully" })
             }
             else {
                 await prisma.postVote.update({
@@ -39,6 +41,7 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                         vote_type,
                     }
                 })
+                return res.status(200).json({ success: true, message: "Vote updated successfully" })
             }
         } else {
             await prisma.postVote.create({
@@ -48,6 +51,40 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                     vote_type
                 }
             })
+            if (vote_type === 1) {
+                const userfcmtoken = await prisma.post.findUnique({
+                    where: {
+                        id: post_id
+                    },
+                    include: {
+                        author: {
+                            select: {
+                                fcm_token: true
+                            }
+                        }
+                    }
+                });
+                const voteduser = await prisma.user.findUnique({
+                    where: {
+                        id: user_id
+                    }
+                })
+                if(userfcmtoken?.author.fcm_token){
+                    const message = {
+                        notification:{
+                            title: "New Upvote",
+                            body: `${voteduser?.username} upvoted your post`
+                        },
+                        token: userfcmtoken.author.fcm_token
+                    }
+                    try{
+                        await admin.messaging().send(message);
+                        res.status(200).json({success:true,message:"Notification successfully send"})
+                    }catch(error: any){
+                        res.status(505).json({success:false,message:error})
+                    }
+                }
+            }
         }
         return res.status(200).json({ success: true, message: "Vote added successfully" })
     } catch (error: any) {
@@ -56,7 +93,7 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
 }
 
 export const commentVote = async (req: Request, res: TypedResponse<ApiResponse<Vote>>): Promise<any> => {
-    const {  comment_id, vote_type } = req.body;
+    const { comment_id, vote_type } = req.body;
     const user_id = (req as any).user_id;
     try {
         const comment = await prisma.comment.findUnique({
@@ -109,9 +146,43 @@ export const commentVote = async (req: Request, res: TypedResponse<ApiResponse<V
                     vote_type
                 }
             })
+            if(vote_type ===1){
+                const uservoteid = await prisma.comment.findUnique({
+                    where: {
+                        id:comment_id
+                    },
+                    include:{
+                        author:{
+                            select:{
+                                fcm_token:true
+                            }
+                        }
+                    }
+                })
+                const user = await prisma.user.findUnique({
+                    where: {
+                        id:user_id
+                    }
+                })
+                if(uservoteid?.author.fcm_token){
+                    const message = {
+                        notification:{
+                            title:"New vote on your comment",
+                            body:`${user?.username} voted on your comment`,
+                        },
+                        token:uservoteid.author.fcm_token
+                    }
+                    try{
+                        await admin.messaging().send(message)
+                        console.log('Message sent successfully');
+                    }catch(error: any){
+                        res.status(500).json({success:false,message:"Failed to send notification"})
+                    }
+                }
+            }
             return res.status(200).json({ success: true, message: "Vote added successfully" })
         }
     } catch (error: any) {
-        return res.status(500).json({success:false, message: error.message })
+        return res.status(500).json({ success: false, message: error.message })
     }
 }

@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import prisma from '../db/prismaclient.js'
-// import { TypedResponse } from '../types/typedResponse.js';
-// import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
-
+import admin from "../firebase.js";
 
 
 export const followcontroller = async (req: Request, res: Response) => {
@@ -20,7 +18,18 @@ export const followcontroller = async (req: Request, res: Response) => {
   if (check) {
     res.json({ success: false, message: "User already follow the subs" })
   }
+  const subredditExists = await prisma.subreddit.findUnique({
+    where: {
+      id: subs_id,
+    },
+  });
 
+  if (!subredditExists) {
+    return res.status(400).json({
+      success: false,
+      message: "Subreddit not found. Cannot follow.",
+    });
+  }
   const subreddit = await prisma.userSubs.create({
     data: {
       followed_by_id: followed_by_id,
@@ -28,6 +37,40 @@ export const followcontroller = async (req: Request, res: Response) => {
     }
 
   })
+  const sub_userid = await prisma.subreddit.findUnique({
+    where: {
+      id: subs_id
+    },
+    include: {
+      creator: {
+        select: {
+          fcm_token: true
+        }
+      }
+    }
+  })
+  
+  const follower = await prisma.user.findUnique({
+    where: {
+      id: followed_by_id
+    }
+  })
+  if (sub_userid?.creator.fcm_token) {
+    const message = {
+      notification: {
+        title: 'New Follower!',
+        body: `${follower?.username} followed you.`
+      },
+      token: sub_userid.creator.fcm_token,
+    };
+
+    try {
+      await admin.messaging().send(message);
+      console.log('Message sent successfully');
+    } catch (error: any) {
+      console.log('Error sending message:', error);
+    }
+  }
   res.json({ success: true, message: 'followed', data: subreddit })
 
 
@@ -68,5 +111,5 @@ export const unfollowsub = async (req: Request, res: Response): Promise<any> => 
     })
     return res.status(200).json({ success: true, message: "Subs unfollowed", data: unfollow })
   }
-  return res.status(400).json({ success: false, message: "You did not follow this sub"})
+  return res.status(400).json({ success: false, message: "You did not follow this sub" })
 }

@@ -8,5 +8,6 @@ export interface Post {
   subreddit_id?: string | null;
   comment?: comment[] | null;
   votepost?: number|null;
-  commentvote?:number|null
+  commentvote?:number|null;
+  
 };

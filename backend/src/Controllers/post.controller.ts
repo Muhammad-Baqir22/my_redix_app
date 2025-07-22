@@ -29,8 +29,18 @@ export const postController = async (req: Request, res: TypedResponse<ApiRespons
 }
 
 export const getallPostController = async (req: Request, res: TypedResponse<ApiResponse<Post[]>>): Promise<any> => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.pageSize as string) || 10;
+    const offset = (page - 1) * limit;
+    const totalCount = await prisma.post.count();
+
     try {
         const allpost = await prisma.post.findMany({
+            skip:offset,
+            take:limit,
+            orderBy:{
+                created_at:'desc'
+            },
             include: {
                 author: {
                     select: {
@@ -82,23 +92,23 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
             const root: any[] = [];
             for (const comment of comments) {
                 const currentcomment = commentObj.get(comment.id);
-                
-                    if(comment.parent_comment_id){
-                        const parentcomment = commentObj.get(comment.parent_comment_id);
-                        if(parentcomment){
-                            parentcomment.replies.push(currentcomment);
-                        }
-                    }else{
-                        root.push(currentcomment)
+
+                if (comment.parent_comment_id) {
+                    const parentcomment = commentObj.get(comment.parent_comment_id);
+                    if (parentcomment) {
+                        parentcomment.replies.push(currentcomment);
                     }
-                    const commentvote = await prisma.commentVote.aggregate({
-                        where: { comment_id: comment.id },
-                        _sum: {
-                            vote_type: true
-                        }
-                    })
-                    currentcomment.commentVote = commentvote._sum.vote_type || 0;
-                
+                } else {
+                    root.push(currentcomment)
+                }
+                const commentvote = await prisma.commentVote.aggregate({
+                    where: { comment_id: comment.id },
+                    _sum: {
+                        vote_type: true
+                    }
+                })
+                currentcomment.commentVote = commentvote._sum.vote_type || 0;
+
             }
 
             return {
@@ -110,11 +120,12 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
                 username: post.author.username,
                 subreddit_name: post.subreddit?.name,
                 votes: vote_post._sum.vote_type || 0,
-                comment:root
+                comment: root,
+                
 
             }
         }))
-        return res.status(200).json({ success: true, message: 'Post found', data: allpost_data })
+        return res.status(200).json({ success: true, message: 'Post found', data: allpost_data,pageNo:page,pageSize:limit })
 
     } catch (error: any) {
         return res.status(200).json({ success: false, message: 'Post not found', error: error.message });
@@ -122,9 +133,17 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
 }
 
 export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<Post[]>>): Promise<any> => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.pagesize as string)|| 10;
+    const offset = (page-1)*limit;
     const userid = (req as any).user_id;
     try {
         const userpost = await prisma.post.findMany({
+            skip:offset,
+            take:limit,
+            orderBy:{
+                created_at: 'desc',
+            },
             where: { user_id: userid, subreddit_id: null },
             include: {
                 author: {
@@ -167,7 +186,7 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                     post_id: comment.post_id,
                     username: comment.author.username,
                     replies: [],
-                    commentVote: 0
+                    commentVote: 0,
                 });
             })
             const root: any[] = [];
@@ -199,10 +218,10 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                 subreddit_id: post.subreddit_id,
                 username: post.author.username,
                 votes: vote_post._sum.vote_type || 0,
-                comment: root
+                comment: root,
             }
         }))
-        return res.status(200).json({ success: true, message: "User post found", data: userpost_data })
+        return res.status(200).json({ success: true, message: "User post found", data: userpost_data,pageNo:page,pageSize:limit })
     } catch (error: any) {
         return res.status(400).json({ success: false, message: "User post not found", error: error })
     }
@@ -281,7 +300,7 @@ export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<P
             })
             currentcomment.commentVote = comment_vote._sum.vote_type || 0;
         }
-        
+
         return res.status(200).json({
             success: true, message: "Post found",
             data: {

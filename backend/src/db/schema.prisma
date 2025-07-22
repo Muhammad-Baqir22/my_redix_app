@@ -19,6 +19,7 @@ model User {
   username      String        @unique
   email         String        @unique
   password_hash String
+  fcm_token     String?
   created_at    DateTime      @default(now())
 
   subreddits    Subreddit[]   @relation("UserSubreddits")
@@ -119,3 +120,4 @@ model Userfollow{
   @@unique([followed_by_id,user_id])
 
 }
+
