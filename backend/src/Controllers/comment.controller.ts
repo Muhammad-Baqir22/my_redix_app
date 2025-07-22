@@ -3,6 +3,7 @@ import prisma from "../db/prismaclient.js";
 import { TypedResponse } from '../types/typedResponse.js';
 import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
 import  {comment}  from "../ResponseModel/comment.ResponseModel.js";
+import admin from "../firebase.js";
 
 
 export const postcomment = async (req: Request, res: TypedResponse<ApiResponse<comment>>): Promise<any> => {
@@ -21,6 +22,32 @@ export const postcomment = async (req: Request, res: TypedResponse<ApiResponse<c
                 parent_comment_id: parent_id && parent_id !== "" ? parent_id : null
             }
         });
+        const usercommented = await prisma.post.findUnique({
+            where: { id: post_id },
+            include:{
+                author:{
+                    select:{
+                        fcm_token:true
+                    }
+                }
+            }
+        })
+        const user = await prisma.user.findUnique({ where: { id: user_id } })
+        if(usercommented?.author.fcm_token){
+            const message = {
+                notification: {
+                    title: "New Comment on your Post",
+                    body: `${user?.username} commented on your post : ${content}`
+                },
+                token:usercommented.author.fcm_token
+            }
+            try{
+                await admin.messaging().send(message)
+                console.log("Notification send successfully")
+            }catch(error){
+                console.log("Error sending notification", error)
+            }
+        }
         return res.status(201).json({ success:true,message: "Comment created successfully",data: comment });
     } catch (error: any) {
         if (error.code == 'P2003') {

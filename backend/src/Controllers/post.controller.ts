@@ -4,9 +4,6 @@ import { Post } from "../ResponseModel/post.ResponseModel.js";
 import { TypedResponse } from '../types/typedResponse.js';
 import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
 
-
-
-
 export const postController = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const { title, content, id } = req.body;
     const userid = (req as any).user_id;
