@@ -28,12 +28,35 @@ export const postController = async (req: Request, res: TypedResponse<ApiRespons
 export const getallPostController = async (req: Request, res: TypedResponse<ApiResponse<Post[]>>): Promise<any> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.pageSize as string) || 10;
-    const offset = (page - 1) * limit;
-    const totalCount = await prisma.post.count();
-
+    const skip = (page - 1) * limit;
+    const user_id = (req as any).user_id;
     try {
+        const subredditfollow = await prisma.userSubs.findMany({
+            where: {
+                followed_by_id: user_id
+            },
+            select: {
+                subs_id: true
+            }
+        })
+        const userfollow = await prisma.userfollow.findMany({
+            where:{
+                followed_by_id:user_id
+            },
+            select:{
+                user_id:true
+            }
+        })
+        const subredditfollowid = subredditfollow.map(s=>s.subs_id);
+        const userfollowid = userfollow.map(u=>u.user_id);
         const allpost = await prisma.post.findMany({
-            skip:offset,
+            where: {
+                OR: [
+                    { subreddit_id: { in: subredditfollowid } },
+                    { user_id: { in: userfollowid } },
+                ]
+            },
+            skip:skip,
             take:limit,
             orderBy:{
                 created_at:'desc'
