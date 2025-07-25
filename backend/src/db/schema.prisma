@@ -49,6 +49,7 @@ model Post {
   id           String          @id @default(uuid())
   title        String
   content      String?
+  media_url    String?
   created_at   DateTime     @default(now())
   user_id      String
   subreddit_id String?
