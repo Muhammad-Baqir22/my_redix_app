@@ -1,12 +1,12 @@
 import express from 'express';
 
-import userRouter from './routes/user.routes.js'; 
-import authRouter from './routes/auth.router.js'; 
-import post from './routes/post.router.js'
-import subreddit from './routes/subreddit.router.js';
-import commentRouter from './routes/comment.router.js';
-import voteRouter from './routes/vote.router.js';
-import notificationRouter from './routes/notification.router.js';
+import userRouter from './routes/user.routes'; 
+import authRouter from './routes/auth.router'; 
+import post from './routes/post.router'
+import subreddit from './routes/subreddit.router';
+import commentRouter from './routes/comment.router';
+import voteRouter from './routes/vote.router';
+import notificationRouter from './routes/notification.router';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();

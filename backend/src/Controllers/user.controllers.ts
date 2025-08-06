@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
-import prisma from "../db/prismaclient.js";
+import prisma from "../db/prismaclient";
 import Jwt from 'jsonwebtoken';
 
-import { ApiResponse} from "../ResponseModel/api.ResponseModel.js";
-import {AuthResponse} from "../ResponseModel/auth.ResponseModel.js";
-import { TypedResponse } from '../types/typedResponse.js';
+import { ApiResponse} from "../ResponseModel/api.ResponseModel";
+import {AuthResponse} from "../ResponseModel/auth.ResponseModel";
+import { TypedResponse } from '../types/typedResponse';
 
 
 export const createUser = async (req: Request, res: Response) : Promise<any> => {

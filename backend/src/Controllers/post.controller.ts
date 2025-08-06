@@ -1,19 +1,29 @@
 import { Request, Response } from "express";
-import prisma from "../db/prismaclient.js";
-import { Post } from "../ResponseModel/post.ResponseModel.js";
-import { TypedResponse } from '../types/typedResponse.js';
-import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
+import prisma from "../db/prismaclient";
+import { Post } from "../ResponseModel/post.ResponseModel";
+import { TypedResponse } from '../types/typedResponse';
+import { ApiResponse } from "../ResponseModel/api.ResponseModel";
 
 export const postController = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const { title, content, id } = req.body;
     const userid = (req as any).user_id;
+    const file = req.file;
+    let media_url = null;
+
+    if (file) {
+      media_url = (file as any).location;
+    }
+    if (!req.file) {
+      return res.status(400).json({ success:false,message: 'No file uploaded' });
+    }
     try {
         const post = await prisma.post.create({
             data: {
                 title,
                 content,
                 user_id: userid,
-                subreddit_id: id && id.trim() !== "" ? id : null
+                subreddit_id: id && id.trim() !== "" ? id : null,
+                media_url
             }
         });
         return res.status(200).json({ success: true, message: 'Post Ctreated', data: { title: post.title, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id } });
@@ -47,8 +57,8 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
                 user_id:true
             }
         })
-        const subredditfollowid = subredditfollow.map(s=>s.subs_id);
-        const userfollowid = userfollow.map(u=>u.user_id);
+        const subredditfollowid = subredditfollow.map((s : any) =>s.subs_id);
+        const userfollowid = userfollow.map((u : any)=>u.user_id);
         const allpost = await prisma.post.findMany({
             where: {
                 OR: [
@@ -77,7 +87,7 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
         if (!allpost) {
             return res.status(404).json({ success: false, message: 'Post not found' })
         }
-        const allpost_data = await Promise.all(allpost.map(async post => {
+        const allpost_data = await Promise.all(allpost.map(async (post : any) => {
             const vote_post = await prisma.postVote.aggregate({
                 where: { post_id: post.id },
                 _sum: {
@@ -95,7 +105,7 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
                 }
             });
             const commentObj = new Map<string, any>();
-            comments.forEach(comment => {
+            comments.forEach((comment : any) => {
                 commentObj.set(comment.id, {
                     id: comment.id,
                     content: comment.content,
@@ -178,7 +188,7 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
             return res.status(404).json({ success: false, message: "User post not found" })
         }
 
-        const userpost_data = await Promise.all(userpost.map(async post => {
+        const userpost_data = await Promise.all(userpost.map(async (post:any) => {
             const vote_post = await prisma.postVote.aggregate({
                 where: { post_id: post.id },
                 _sum: {
@@ -196,7 +206,7 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                 }
             });
             const commentObj = new Map<string, any>();
-            comments.forEach((comment) => {
+            comments.forEach((comment : any) => {
                 commentObj.set(comment.id, {
                     id: comment.id,
                     content: comment.content,
@@ -286,7 +296,7 @@ export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<P
             }
         });
         const commentObj = new Map<string, any>();
-        comments.forEach((comment) => {
+        comments.forEach((comment : any) => {
             commentObj.set(comment.id, {
                 id: comment.id,
                 content: comment.content,

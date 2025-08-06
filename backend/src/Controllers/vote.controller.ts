@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import prisma from '../db/prismaclient.js'
-import { TypedResponse } from '../types/typedResponse.js';
-import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
-import { Vote } from '../ResponseModel/vote.ResponseModel.js'
-import admin from '../firebase.js'
+import prisma from '../db/prismaclient'
+import { TypedResponse } from '../types/typedResponse';
+import { ApiResponse } from "../ResponseModel/api.ResponseModel";
+import { Vote } from '../ResponseModel/vote.ResponseModel'
+import admin from '../firebase'
 
 export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote>>): Promise<any> => {
     const { vote_type, post_id } = req.body;

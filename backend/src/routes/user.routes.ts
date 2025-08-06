@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { createUser } from '../Controllers/user.controllers.js';
-import validaterequest from '../Middleware/validateRequest.middleware.js';
-import userValidation from '../validators/user.validator.js'
-import { tokenVerify } from '../Middleware/auth.middleware.js';
-import { followuser } from '../Controllers/userfollow.controller.js';
-import { getfolllowUser } from '../Controllers/userfollow.controller.js';
-import { unfollowuser } from '../Controllers/userfollow.controller.js';
+import { createUser } from '../Controllers/user.controllers';
+import validaterequest from '../Middleware/validateRequest.middleware';
+import userValidation from '../validators/user.validator'
+import { tokenVerify } from '../Middleware/auth.middleware';
+import { followuser } from '../Controllers/userfollow.controller';
+import { getfolllowUser } from '../Controllers/userfollow.controller';
+import { unfollowuser } from '../Controllers/userfollow.controller';
 const router = Router();
 router.post('/', validaterequest(userValidation),createUser);
 router.post('/userfollow',tokenVerify,followuser);

@@ -1,8 +1,8 @@
 import {Request,Response} from 'express';
-import prisma from '../db/prismaclient.js'
-import { TypedResponse } from '../types/typedResponse.js';
-import {subreddit} from '../ResponseModel/subreddit.ResponseModel.js'
-import { ApiResponse } from '../ResponseModel/api.ResponseModel.js';
+import prisma from '../db/prismaclient'
+import { TypedResponse } from '../types/typedResponse';
+import {subreddit} from '../ResponseModel/subreddit.ResponseModel'
+import { ApiResponse } from '../ResponseModel/api.ResponseModel';
 
 export const createSub = async (req:Request , res: TypedResponse<ApiResponse<subreddit>>) : Promise<any> =>{
     const {name,description} = req.body;

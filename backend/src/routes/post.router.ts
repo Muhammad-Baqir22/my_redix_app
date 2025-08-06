@@ -1,11 +1,11 @@
 import { Router } from "express";
-import {postController} from '../Controllers/post.controller.js'
-import {getallPostController} from '../Controllers/post.controller.js'
-import {getuserpost} from '../Controllers/post.controller.js'
-import {tokenVerify} from '../Middleware/auth.middleware.js';
-import postValidation from "../validators/create_post.validator.js";
-import validaterequest from "../Middleware/validateRequest.middleware.js";
-import {getpostbyid} from '../Controllers/post.controller.js'
+import {postController} from '../Controllers/post.controller'
+import {getallPostController} from '../Controllers/post.controller'
+import {getuserpost} from '../Controllers/post.controller'
+import {tokenVerify} from '../Middleware/auth.middleware';
+import postValidation from "../validators/create_post.validator";
+import validaterequest from "../Middleware/validateRequest.middleware";
+import {getpostbyid} from '../Controllers/post.controller'
 const router = Router();
 
 router.post('/',validaterequest(postValidation),tokenVerify,postController);

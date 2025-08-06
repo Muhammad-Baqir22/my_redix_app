@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../db/prismaclient.js";
+import prisma from "../db/prismaclient";
 export const getnotification = async (req: Request, res: Response) => {
     const user_id = (req as any).user_id;
     const page = parseInt(req.query.page as string)||1;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import prisma from '../db/prismaclient.js'
-import admin from "../firebase.js";
+import prisma from '../db/prismaclient'
+import admin from "../firebase";
 
 
 export const followcontroller = async (req: Request, res: Response) => {

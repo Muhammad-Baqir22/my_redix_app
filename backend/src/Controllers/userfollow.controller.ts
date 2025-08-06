@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from '../db/prismaclient.js'
+import prisma from '../db/prismaclient'
 
 export const followuser = async (req: Request, res: Response) => {
     const followed_by_id = (req as any).user_id;

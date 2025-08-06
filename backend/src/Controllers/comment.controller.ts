@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import prisma from "../db/prismaclient.js";
-import { TypedResponse } from '../types/typedResponse.js';
-import { ApiResponse } from "../ResponseModel/api.ResponseModel.js";
-import { comment } from "../ResponseModel/comment.ResponseModel.js";
-import admin from "../firebase.js";
+import prisma from "../db/prismaclient";
+import { TypedResponse } from '../types/typedResponse';
+import { ApiResponse } from "../ResponseModel/api.ResponseModel";
+import { comment } from "../ResponseModel/comment.ResponseModel";
+import admin from "../firebase";
 
 
 export const postcomment = async (req: Request, res: TypedResponse<ApiResponse<comment>>): Promise<any> => {
@@ -83,7 +83,7 @@ export const getcomments = async (req: Request, res: TypedResponse<ApiResponse<c
         }
 
         const commentObj = new Map<string, any>();
-        comments.forEach(comment => {
+        comments.forEach((comment : any) => {
             commentObj.set(comment.id, {
                 id: comment.id,
                 content: comment.content,
@@ -96,7 +96,7 @@ export const getcomments = async (req: Request, res: TypedResponse<ApiResponse<c
             });
         })
         const root: any[] = [];
-        comments.forEach(comment => {
+        comments.forEach((comment : any) => {
             const currentcomment = commentObj.get(comment.id);
             if (comment.parent_comment_id) {
                 const parentcomment = commentObj.get(comment.parent_comment_id);
