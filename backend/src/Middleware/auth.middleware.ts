@@ -3,8 +3,6 @@ import { Request,Response,NextFunction } from "express";
 import JWT from 'jsonwebtoken';
 
 export const tokenVerify =async (req:Request,res:Response,next:NextFunction) : Promise<any> =>{
-    //const token = req.body.token;
-    //const authHeader = req.headers.authorization;
     const authHeader = req.header('Authorization');
     const token = authHeader && authHeader.split(' ')[1];
 

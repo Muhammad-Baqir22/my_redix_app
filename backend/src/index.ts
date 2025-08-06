@@ -7,13 +7,18 @@ import subreddit from './routes/subreddit.router.js';
 import commentRouter from './routes/comment.router.js';
 import voteRouter from './routes/vote.router.js';
 import notificationRouter from './routes/notification.router.js';
+import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true ,
+  exposedHeaders: ['Authorization'],
+}));
 app.use(express.json());
 
 app.use('/api/users', userRouter);

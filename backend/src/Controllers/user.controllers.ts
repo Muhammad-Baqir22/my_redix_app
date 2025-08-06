@@ -20,7 +20,6 @@ export const createUser = async (req: Request, res: Response) : Promise<any> => 
                 password_hash: hashedPassword
             },
         });
-        //const token = Jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '2d' })
         return res.status(201).json({ success: true,message: 'user Created', data: {user:{ id: user.id, username: user.username,email:user.email }} });
     } catch (error: any) {
         return res.json({
