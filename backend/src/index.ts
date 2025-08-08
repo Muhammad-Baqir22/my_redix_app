@@ -7,6 +7,7 @@ import subreddit from './routes/subreddit.router';
 import commentRouter from './routes/comment.router';
 import voteRouter from './routes/vote.router';
 import notificationRouter from './routes/notification.router';
+import uploadRouter from './routes/upload.router';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -28,7 +29,7 @@ app.use('/api/subreddit',subreddit);
 app.use('/api/comment',commentRouter);
 app.use('/api/vote',voteRouter);
 app.use('/api/notification',notificationRouter);
-
+app.use('/api/upload',uploadRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

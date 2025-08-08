@@ -5,7 +5,7 @@ import {getuserpost} from '../Controllers/post.controller'
 import {tokenVerify} from '../Middleware/auth.middleware';
 import postValidation from "../validators/create_post.validator";
 import validaterequest from "../Middleware/validateRequest.middleware";
-import {getpostbyid} from '../Controllers/post.controller'
+import {getpostbyid} from '../Controllers/post.controller';
 const router = Router();
 
 router.post('/',validaterequest(postValidation),tokenVerify,postController);

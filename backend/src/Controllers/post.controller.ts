@@ -5,14 +5,9 @@ import { TypedResponse } from '../types/typedResponse';
 import { ApiResponse } from "../ResponseModel/api.ResponseModel";
 
 export const postController = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
-    const { title, content, id } = req.body;
+    const { title, content, id , media_url} = req.body;
     const userid = (req as any).user_id;
-    const file = req.file;
-    let media_url = null;
-
-    if (file) {
-      media_url = (file as any).location;
-    }
+    
     if (!req.file) {
       return res.status(400).json({ success:false,message: 'No file uploaded' });
     }
@@ -26,7 +21,7 @@ export const postController = async (req: Request, res: TypedResponse<ApiRespons
                 media_url
             }
         });
-        return res.status(200).json({ success: true, message: 'Post Ctreated', data: { title: post.title, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id } });
+        return res.status(200).json({ success: true, message: 'Post Ctreated', data: { title: post.title, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id ,media_Url: post.media_url} });
     } catch (error: any) {
         if (error.code === 'P2003') {
             return res.status(400).json({ success: false, message: 'Invalid subreddit_id: The subreddit does not exist.' });
