@@ -8,9 +8,9 @@ export const postController = async (req: Request, res: TypedResponse<ApiRespons
     const { title, content, id , media_url} = req.body;
     const userid = (req as any).user_id;
     
-    if (!req.file) {
-      return res.status(400).json({ success:false,message: 'No file uploaded' });
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({ success:false,message: 'No file uploaded' });
+    // }
     try {
         const post = await prisma.post.create({
             data: {
@@ -146,6 +146,7 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
                 subreddit_name: post.subreddit?.name,
                 votes: vote_post._sum.vote_type || 0,
                 comment: root,
+                media_url: post.media_url
                 
 
             }
