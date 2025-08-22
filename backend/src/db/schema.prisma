@@ -31,6 +31,10 @@ model User {
   userfollow  Userfollow[] @relation("UserFollowsUser")
   followtouser  Userfollow[] @relation("FollowedToUser")
   notification  Notification[] @relation("NotificationUser")
+
+  sentMessages     Message[] @relation("SenderUser")
+  receivedMessages Message[] @relation("ReciverUser")
+  
 }
 
 model Subreddit {
@@ -43,6 +47,8 @@ model Subreddit {
   creator     User      @relation("UserSubreddits", fields: [created_by], references: [id])
   posts       Post[]
   followers   UserSubs[] @relation("SubredditFollowers")
+
+  subsMessage  Message[]@relation("SubredditReciver")
 }
 
 model Post {
@@ -132,4 +138,17 @@ model Notification{
   created_at DateTime @default(now())
 
   user         User     @relation("NotificationUser",fields: [user_id], references: [id])
+}
+
+model Message {
+  id           String     @id @default(uuid())
+  senderId     String
+  receiverId   String?
+  subredditId  String? 
+  content      String
+  createdAt    DateTime  @default(now())
+
+  sender       User      @relation("SenderUser",fields: [senderId], references: [id])
+  receiver     User?     @relation("ReciverUser",fields: [receiverId], references: [id])
+  subreddit    Subreddit? @relation("SubredditReciver",fields: [subredditId], references: [id])
 }

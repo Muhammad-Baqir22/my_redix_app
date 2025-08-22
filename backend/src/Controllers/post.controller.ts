@@ -7,10 +7,6 @@ import { ApiResponse } from "../ResponseModel/api.ResponseModel";
 export const postController = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const { title, content, id , media_url} = req.body;
     const userid = (req as any).user_id;
-    
-    // if (!req.file) {
-    //   return res.status(400).json({ success:false,message: 'No file uploaded' });
-    // }
     try {
         const post = await prisma.post.create({
             data: {
@@ -21,7 +17,7 @@ export const postController = async (req: Request, res: TypedResponse<ApiRespons
                 media_url
             }
         });
-        return res.status(200).json({ success: true, message: 'Post Ctreated', data: { title: post.title, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id ,media_Url: post.media_url} });
+        return res.status(200).json({ success: true, message: 'Post Ctreated', data: { title: post.title, content: post.content, user_id: post.user_id, subreddit_id: post.subreddit_id ,media_url: post.media_url} });
     } catch (error: any) {
         if (error.code === 'P2003') {
             return res.status(400).json({ success: false, message: 'Invalid subreddit_id: The subreddit does not exist.' });
@@ -245,6 +241,7 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                 username: post.author.username,
                 votes: vote_post._sum.vote_type || 0,
                 comment: root,
+                media_url: post.media_url
             }
         }))
         return res.status(200).json({ success: true, message: "User post found", data: userpost_data,pageNo:page,pageSize:limit })
@@ -331,7 +328,7 @@ export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<P
             success: true, message: "Post found",
             data: {
                 title: post.title, username: post.author.username, name: post.subreddit?.name ?? null, content: post.content,
-                user_id: post.user_id, subreddit_id: post.subreddit_id, comment: root, votepost: vote_post._sum.vote_type,
+                user_id: post.user_id, subreddit_id: post.subreddit_id, comment: root, votepost: vote_post._sum.vote_type, media_url: post.media_url,
 
             }
         });

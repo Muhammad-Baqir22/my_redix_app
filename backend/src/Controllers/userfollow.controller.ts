@@ -32,20 +32,42 @@ export const followuser = async (req: Request, res: Response) => {
 
 export const getfolllowUser = async (req: Request, res: Response) => {
     const followed_by_id = (req as any).user_id;
+
     try {
         const follow = await prisma.userfollow.findMany({
-            where: {
-                followed_by_id
+            where: { followed_by_id },
+            include: {
+                user: { // the person you follow
+                    select: {
+                        id: true,
+                        username: true,
+                        email: true, // optional
+                    }
+                }
             }
-        })
-        if(!follow){
-            return res.status(404).json({ success: false, message: "You don't follow any user" })
+        });
+
+        if (!follow || follow.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "You don't follow any user"
+            });
         }
-        return res.status(200).json({ success: true, message: "You followed the user",data:follow})
-    }catch(error:any){
-        return res.status(500).json({ success: false, message: error.message })
+
+        return res.status(200).json({
+            success: true,
+            message: "Followed users retrieved",
+            data: follow
+        });
+
+    } catch (error: any) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
-}
+};
+
 
 export const unfollowuser = async (req: Request, res: Response) => {
     const followed_by_id = (req as any).user_id;

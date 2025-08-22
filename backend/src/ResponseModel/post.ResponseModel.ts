@@ -9,6 +9,6 @@ export interface Post {
   comment?: comment[] | null;
   votepost?: number|null;
   commentvote?:number|null;
-  media_Url ?: string|null;
+  media_url ?: string|null;
   
 };

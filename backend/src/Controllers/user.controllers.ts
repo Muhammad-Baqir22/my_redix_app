@@ -46,7 +46,7 @@ export const loginController = async (req: Request, res: TypedResponse<ApiRespon
         const passMatch = await bcrypt.compare(password, user.password_hash);
         if (!passMatch)
             res.status(401).json({success: false , message : "Incorrect Password"});
-        const token = Jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '2d' })
+        const token = Jwt.sign({ id: user.id, email: user.email , sub: user.id }, process.env.JWT_SECRET!, { algorithm:"HS256",expiresIn: '2d' })
         if(fcm_token){
             await prisma.user.update({
                 where:{
