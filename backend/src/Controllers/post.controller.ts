@@ -142,9 +142,8 @@ export const getallPostController = async (req: Request, res: TypedResponse<ApiR
                 subreddit_name: post.subreddit?.name,
                 votes: vote_post._sum.vote_type || 0,
                 comment: root,
-                media_url: post.media_url
-                
-
+                media_url: post.media_url,
+                created_at: post.created_at
             }
         }))
         return res.status(200).json({ success: true, message: 'Post found', data: allpost_data,pageNo:page,pageSize:limit })
@@ -241,7 +240,8 @@ export const getuserpost = async (req: Request, res: TypedResponse<ApiResponse<P
                 username: post.author.username,
                 votes: vote_post._sum.vote_type || 0,
                 comment: root,
-                media_url: post.media_url
+                media_url: post.media_url,
+                created_at: post.created_at
             }
         }))
         return res.status(200).json({ success: true, message: "User post found", data: userpost_data,pageNo:page,pageSize:limit })
@@ -329,6 +329,7 @@ export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<P
             data: {
                 title: post.title, username: post.author.username, name: post.subreddit?.name ?? null, content: post.content,
                 user_id: post.user_id, subreddit_id: post.subreddit_id, comment: root, votepost: vote_post._sum.vote_type, media_url: post.media_url,
+                created_at: post.created_at,
 
             }
         });

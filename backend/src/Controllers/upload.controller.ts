@@ -10,7 +10,7 @@ export const genrateSignedUrlController = async (req:Request, res: Response)=>{
     const key = `uploads/${Date.now()}-${filename}`;
     try{
     const signedUrl = await genrateSignedUrl(key, contentType);
-    const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    const fileUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
     return res.json({ success: true, signedUrl, media_Url: fileUrl });
     }catch(error){
         return res.status(500).json({ success: false, message: 'Error generating signed URL'});

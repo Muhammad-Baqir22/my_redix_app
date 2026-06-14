@@ -33,6 +33,21 @@ export const createUser = async (req: Request, res: Response) : Promise<any> => 
     }
 };
 
+export const searchUsers = async (req: Request, res: Response): Promise<any> => {
+    const q = (req.query.q as string ?? "").trim();
+    if (!q) return res.status(200).json({ success: true, message: "No query", data: [] });
+    try {
+        const users = await prisma.user.findMany({
+            where: { username: { contains: q } },
+            select: { id: true, username: true, email: true },
+            take: 20,
+        });
+        return res.status(200).json({ success: true, message: "Users found", data: users });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: "Search failed", error: error.message });
+    }
+};
+
 export const loginController = async (req: Request, res: TypedResponse<ApiResponse<AuthResponse>>) : Promise<any> => {
     const { email, password,fcm_token } = req.body;
 

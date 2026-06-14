@@ -26,6 +26,20 @@ export const createSub = async (req:Request , res: TypedResponse<ApiResponse<sub
 
 }
 
+export const searchSubs = async (req: Request, res: TypedResponse<ApiResponse<subreddit[]>>): Promise<any> => {
+    const q = (req.query.q as string ?? "").trim();
+    if (!q) return res.status(200).json({ success: true, message: "No query", data: [] });
+    try {
+        const subs = await prisma.subreddit.findMany({
+            where: { name: { contains: q } },
+            take: 20,
+        });
+        return res.status(200).json({ success: true, message: "Subreddits found", data: subs });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: "Search failed", error: error.message });
+    }
+};
+
 export const getsubs = async (req:Request , res: TypedResponse<ApiResponse<subreddit[]>>) : Promise<any>=>{
     try{
         const user_id = (req as any).user_id;

@@ -1,6 +1,5 @@
 import {Router} from 'express';
-import {createSub} from '../Controllers/subreddit.controller'
-import {getsubs} from '../Controllers/subreddit.controller'
+import {createSub, getsubs, searchSubs} from '../Controllers/subreddit.controller'
 import {tokenVerify} from '../Middleware/auth.middleware'
 import validaterequest from '../Middleware/validateRequest.middleware';
 import subsValidation from '../validators/create_subs.validator'
@@ -11,6 +10,8 @@ import {unfollowsub} from '../Controllers/followsubs.controller'
 const router = Router();
 
 router.post('/sub',validaterequest(subsValidation),tokenVerify,createSub)
+
+router.get('/search', tokenVerify, searchSubs);
 
 router.get('/subs/',tokenVerify,getsubs)
 
