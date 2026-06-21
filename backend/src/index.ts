@@ -9,6 +9,7 @@ import voteRouter from './routes/vote.router';
 import notificationRouter from './routes/notification.router';
 import uploadRouter from './routes/upload.router';
 import chatRoutes from "./routes/chat.router";
+import savedpostRouter from "./routes/savedpost.router";
 import './mqtt/mqttClient'
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -33,6 +34,7 @@ app.use('/api/vote',voteRouter);
 app.use('/api/notification',notificationRouter);
 app.use('/api/upload',uploadRouter);
 app.use('/api/chat', chatRoutes);
+app.use('/api/saved', savedpostRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

@@ -62,6 +62,32 @@ export function getProfileImages(): { avatarUrl: string; bannerUrl: string } {
   };
 }
 
+export function getSavedPosts(): import("@/types/api").FeedPost[] {
+  if (typeof window === "undefined") return [];
+  const store = getStore();
+  try { return JSON.parse(store?.getItem("savedPosts") ?? "[]"); } catch { return []; }
+}
+
+export function toggleSavedPost(post: import("@/types/api").FeedPost): boolean {
+  const store = getStore();
+  if (!store) return false;
+  const saved = getSavedPosts();
+  const idx   = saved.findIndex((p) => p.id === post.id);
+  if (idx === -1) {
+    saved.unshift(post);
+    store.setItem("savedPosts", JSON.stringify(saved));
+    return true;
+  } else {
+    saved.splice(idx, 1);
+    store.setItem("savedPosts", JSON.stringify(saved));
+    return false;
+  }
+}
+
+export function isPostSaved(postId: string): boolean {
+  return getSavedPosts().some((p) => p.id === postId);
+}
+
 function buildHeaders(): Record<string, string> {
   const token = getToken();
   return {

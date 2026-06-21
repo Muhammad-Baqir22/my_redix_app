@@ -29,6 +29,8 @@ client.on('connect',()=>{
 })
 client.on("message",async (topic, message) => {
   try{
+  // Ignore backend-published real-time notifications (msg/ prefix)
+  if(topic.startsWith('msg/')) return;
   console.log(`Received message on ${topic}: ${message.toString()}`);
   const messageString = message.toString();
   const parts = topic.split('/');

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request } from "express";
 import prisma from '../db/prismaclient'
 import { TypedResponse } from '../types/typedResponse';
 import { ApiResponse } from "../ResponseModel/api.ResponseModel";
@@ -44,54 +44,38 @@ export const votePost = async (req: Request, res: TypedResponse<ApiResponse<Vote
                 return res.status(200).json({ success: true, message: "Vote updated successfully" })
             }
         } else {
-            await prisma.postVote.create({
-                data: {
-                    user_id,
-                    post_id,
-                    vote_type
-                }
-            })
+            await prisma.postVote.create({ data: { user_id, post_id, vote_type } });
+
             if (vote_type === 1) {
-                const userfcmtoken = await prisma.post.findUnique({
-                    where: {
-                        id: post_id
-                    },
-                    include: {
-                        author: {
-                            select: {
-                                id: true,
-                                fcm_token: true
-                            }
-                        }
-                    }
-                });
-                const voteduser = await prisma.user.findUnique({
-                    where: {
-                        id: user_id
-                    }
-                })
-                if (userfcmtoken?.author.fcm_token) {
-                    const message = {
-                        notification: {
-                            title: "New Upvote",
-                            body: `${voteduser?.username} upvoted your post`
-                        },
-                        token: userfcmtoken.author.fcm_token
-                    }
-                    try {
-                        await admin.messaging().send(message);
-                        res.status(200).json({ success: true, message: "Notification successfully send" })
-                    } catch (error: any) {
-                        res.status(505).json({ success: false, message: error })
-                    }
+                const [post, voter] = await Promise.all([
+                    prisma.post.findUnique({
+                        where: { id: post_id },
+                        include: { author: { select: { id: true, username: true, fcm_token: true } } },
+                    }),
+                    prisma.user.findUnique({ where: { id: user_id }, select: { username: true } }),
+                ]);
+
+                // Only notify if upvoting someone else's post
+                if (post && post.author.id !== user_id) {
+                    // Always save to DB
                     await prisma.notification.create({
                         data: {
-                            user_id: userfcmtoken.author.id,
-                            type: 'like',
-                            message: `${voteduser?.username} Liked your Post`,
-                            Read: false
-                        }
-                    })
+                            user_id: post.author.id,
+                            type: "like",
+                            message: `u/${voter?.username ?? "Someone"} upvoted your post`,
+                            Read: false,
+                        },
+                    });
+
+                    // FCM push only if token is present
+                    if (post.author.fcm_token) {
+                        try {
+                            await admin.messaging().send({
+                                notification: { title: "New Upvote", body: `${voter?.username} upvoted your post` },
+                                token: post.author.fcm_token,
+                            });
+                        } catch { /* ignore FCM errors */ }
+                    }
                 }
             }
         }
@@ -148,54 +132,35 @@ export const commentVote = async (req: Request, res: TypedResponse<ApiResponse<V
             }
 
         } else {
-            await prisma.commentVote.create({
-                data: {
-                    user_id,
-                    comment_id,
-                    vote_type
-                }
-            })
+            await prisma.commentVote.create({ data: { user_id, comment_id, vote_type } });
+
             if (vote_type === 1) {
-                const uservoteid = await prisma.comment.findUnique({
-                    where: {
-                        id: comment_id
-                    },
-                    include: {
-                        author: {
-                            select: {
-                                id: true,
-                                fcm_token: true
-                            }
-                        }
-                    }
-                })
-                const user = await prisma.user.findUnique({
-                    where: {
-                        id: user_id
-                    }
-                })
-                if (uservoteid?.author.fcm_token) {
-                    const message = {
-                        notification: {
-                            title: "New vote on your comment",
-                            body: `${user?.username} voted on your comment`,
-                        },
-                        token: uservoteid.author.fcm_token
-                    }
-                    try {
-                        await admin.messaging().send(message)
-                        console.log('Message sent successfully');
-                    } catch (error: any) {
-                        res.status(500).json({ success: false, message: "Failed to send notification" })
-                    }
+                const [commentWithAuthor, voter] = await Promise.all([
+                    prisma.comment.findUnique({
+                        where: { id: comment_id },
+                        include: { author: { select: { id: true, username: true, fcm_token: true } } },
+                    }),
+                    prisma.user.findUnique({ where: { id: user_id }, select: { username: true } }),
+                ]);
+
+                if (commentWithAuthor && commentWithAuthor.author.id !== user_id) {
                     await prisma.notification.create({
                         data: {
-                            user_id: uservoteid.author.id,
-                            type: 'like',
-                            message: `${user?.username} like your comment`,
-                            Read: false
-                        }
-                    })
+                            user_id: commentWithAuthor.author.id,
+                            type: "like",
+                            message: `u/${voter?.username ?? "Someone"} upvoted your comment`,
+                            Read: false,
+                        },
+                    });
+
+                    if (commentWithAuthor.author.fcm_token) {
+                        try {
+                            await admin.messaging().send({
+                                notification: { title: "New vote on your comment", body: `${voter?.username} voted on your comment` },
+                                token: commentWithAuthor.author.fcm_token,
+                            });
+                        } catch { /* ignore FCM errors */ }
+                    }
                 }
             }
             return res.status(200).json({ success: true, message: "Vote added successfully" })

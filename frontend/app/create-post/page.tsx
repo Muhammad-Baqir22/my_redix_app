@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ImagePlus, X, Loader2 } from "lucide-react";
+import { ImagePlus, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ApiSubreddit, ApiResponse } from "@/types/api";
 import { apiFetch, getToken } from "@/lib/api";
 import { communityColor } from "@/lib/utils";
+import Navbar from "@/components/layout/Navbar";
+import LeftSidebar from "@/components/layout/LeftSidebar";
 
 export default function CreatePostPage() {
   const router   = useRouter();
@@ -108,24 +110,12 @@ export default function CreatePostPage() {
         onChange={handleImageSelect}
       />
 
-      {/* Navbar */}
-      <nav
-        className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 border-b border-white/[0.06]"
-        style={{ background: "#0d1020" }}
-      >
-        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft size={16} />
-          Back to feed
-        </Link>
-        <span
-          className="ml-4 text-xl font-black tracking-tight"
-          style={{ background: "linear-gradient(135deg, #a78bfa, #818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-        >
-          RediX
-        </span>
-      </nav>
+      <Navbar />
 
-      <main className="pt-14 max-w-2xl mx-auto px-4 py-8">
+      <div className="flex pt-14">
+        <LeftSidebar />
+
+        <main className="flex-1 sidebar-ml px-4 py-8">
         <h1 className="text-white text-2xl font-bold mt-5 mb-6">Create a post</h1>
 
         <div className="flex flex-col gap-4">
@@ -265,7 +255,8 @@ export default function CreatePostPage() {
             </div>
           </div>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

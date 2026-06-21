@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Settings, ArrowUp, ArrowDown, MessageSquare, Share2 } from "lucide-react";
+import { Settings, ArrowUp, ArrowDown, MessageSquare, Share2, X } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
@@ -116,17 +116,100 @@ function PostSkeleton() {
   );
 }
 
+/* ─── Follow list modal ─── */
+interface FollowUser { id: string; username: string; email: string; avatar_url?: string | null; }
+
+function FollowModal({
+  title, users, loading, onClose,
+}: {
+  title: string;
+  users: FollowUser[];
+  loading: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl border border-white/[0.1] overflow-hidden"
+        style={{ background: "#0d1020" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07]">
+          <p className="text-white font-bold text-sm">{title}</p>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* List */}
+        <div className="max-h-80 overflow-y-auto">
+          {loading && (
+            <div className="flex flex-col gap-0">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3 animate-pulse">
+                  <div className="w-9 h-9 rounded-full bg-white/[0.07] flex-shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="w-28 h-3 bg-white/[0.07] rounded" />
+                    <div className="w-40 h-2.5 bg-white/[0.05] rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && users.length === 0 && (
+            <p className="text-gray-500 text-sm text-center py-10">Nobody here yet.</p>
+          )}
+
+          {!loading && users.map((u) => (
+            <Link
+              key={u.id}
+              href={`/profile/${u.username}`}
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors"
+            >
+              <div
+                className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                style={u.avatar_url ? undefined : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+              >
+                {u.avatar_url
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={u.avatar_url} alt={u.username} className="w-full h-full object-cover" />
+                  : u.username[0].toUpperCase()
+                }
+              </div>
+              <div className="min-w-0">
+                <p className="text-white text-sm font-medium truncate">u/{u.username}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main page ─── */
 export default function ProfilePage() {
   const router = useRouter();
 
-  const [username,   setUsername]   = useState("");
-  const [email,      setEmail]      = useState("");
-  const [posts,      setPosts]      = useState<FeedPost[]>([]);
-  const [loading,    setLoading]    = useState(true);
-  const [activeTab,  setActiveTab]  = useState<"posts" | "saved" | "tagged">("posts");
-  const [avatarUrl,  setAvatarUrl]  = useState("");
-  const [bannerUrl,  setBannerUrl]  = useState("");
+  const [username,        setUsername]        = useState("");
+  const [email,           setEmail]           = useState("");
+  const [posts,           setPosts]           = useState<FeedPost[]>([]);
+  const [loading,         setLoading]         = useState(true);
+  const [activeTab,       setActiveTab]       = useState<"posts" | "saved" | "tagged">("posts");
+  const [avatarUrl,       setAvatarUrl]       = useState("");
+  const [bannerUrl,       setBannerUrl]       = useState("");
+  const [followersCount,  setFollowersCount]  = useState(0);
+  const [followingCount,  setFollowingCount]  = useState(0);
+  const [modal,           setModal]           = useState<"followers" | "following" | null>(null);
+  const [modalUsers,      setModalUsers]      = useState<FollowUser[]>([]);
+  const [modalLoading,    setModalLoading]    = useState(false);
 
   useEffect(() => {
     if (!getToken()) { router.push("/login"); return; }
@@ -140,21 +223,47 @@ export default function ProfilePage() {
     if (av) setAvatarUrl(av);
     if (bv) setBannerUrl(bv);
 
-    const loadPosts = () =>
-      apiFetch<ApiResponse<FeedPost[]>>("/api/post/user?page=1&pageSize=20")
-        .then((res) => {
-          const data = res.data ?? [];
-          setPosts(data);
-          // extract username from first post if not in storage
-          if (!user.username && data[0]?.username) setUsername(data[0].username);
-          else if (user.username) setUsername(user.username);
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-
-    loadPosts();
+    apiFetch<ApiResponse<FeedPost[]>>("/api/post/user?page=1&pageSize=20")
+      .then((res) => {
+        const data = res.data ?? [];
+        setPosts(data);
+        const resolvedUsername = user.username || data[0]?.username || "";
+        if (resolvedUsername) {
+          setUsername(resolvedUsername);
+          apiFetch<ApiResponse<{ followers_count: number; following_count: number; avatar_url?: string; banner_url?: string }>>(`/api/users/${resolvedUsername}`)
+            .then((r) => {
+              setFollowersCount(r.data.followers_count ?? 0);
+              setFollowingCount(r.data.following_count ?? 0);
+              if (r.data.avatar_url) setAvatarUrl(r.data.avatar_url);
+              if (r.data.banner_url) setBannerUrl(r.data.banner_url);
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const openModal = async (type: "followers" | "following") => {
+    setModal(type);
+    setModalUsers([]);
+    setModalLoading(true);
+    try {
+      const endpoint = type === "followers" ? "/api/users/followers" : "/api/users/userfollow";
+      const res = await apiFetch<ApiResponse<any[]>>(endpoint);
+      const list: FollowUser[] = (res.data ?? []).map((entry: any) =>
+        type === "followers"
+          ? { id: entry.followby.id, username: entry.followby.username, email: entry.followby.email, avatar_url: entry.followby.avatar_url }
+          : { id: entry.user.id,     username: entry.user.username,     email: entry.user.email,     avatar_url: entry.user.avatar_url }
+      );
+      setModalUsers(list);
+    } catch {
+      setModalUsers([]);
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   const displayName  = username || (email ? email.split("@")[0] : "");
   const avatarLetter = displayName ? displayName.charAt(0).toUpperCase() : "?";
@@ -169,18 +278,22 @@ export default function ProfilePage() {
     <>
       <Toaster position="top-center" theme="dark" richColors closeButton />
 
+      {modal && (
+        <FollowModal
+          title={modal === "followers" ? "Followers" : "Following"}
+          users={modalUsers}
+          loading={modalLoading}
+          onClose={() => setModal(null)}
+        />
+      )}
+
       <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
         <Navbar />
 
         <div className="flex pt-14">
-          <div
-            className="hidden md:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-white/[0.06] overflow-y-auto"
-            style={{ background: "#0d1020" }}
-          >
-            <LeftSidebar />
-          </div>
+          <LeftSidebar />
 
-          <main className="flex-1 md:ml-56 min-h-[calc(100vh-3.5rem)]">
+          <main className="flex-1 sidebar-ml min-h-[calc(100vh-3.5rem)]">
             <div className="max-w-2xl mx-auto">
 
               {/* ── Banner ── */}
@@ -246,14 +359,20 @@ export default function ProfilePage() {
                     <span className="text-white text-sm font-bold">{posts.length}</span>
                     <span className="text-gray-500 text-sm">posts</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white text-sm font-bold">0</span>
+                  <button
+                    onClick={() => openModal("followers")}
+                    className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+                  >
+                    <span className="text-white text-sm font-bold">{followersCount}</span>
                     <span className="text-gray-500 text-sm">followers</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white text-sm font-bold">0</span>
+                  </button>
+                  <button
+                    onClick={() => openModal("following")}
+                    className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+                  >
+                    <span className="text-white text-sm font-bold">{followingCount}</span>
                     <span className="text-gray-500 text-sm">following</span>
-                  </div>
+                  </button>
                 </div>
               </div>
 

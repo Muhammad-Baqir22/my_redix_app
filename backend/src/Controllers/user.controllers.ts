@@ -33,13 +33,55 @@ export const createUser = async (req: Request, res: Response) : Promise<any> => 
     }
 };
 
+export const getUserProfile = async (req: Request, res: Response): Promise<any> => {
+    const { username } = req.params;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { username },
+            select: { id: true, username: true, created_at: true, avatar_url: true, banner_url: true },
+        });
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const [followers_count, following_count] = await Promise.all([
+            prisma.userfollow.count({ where: { user_id: user.id } }),
+            prisma.userfollow.count({ where: { followed_by_id: user.id } }),
+        ]);
+
+        return res.status(200).json({
+            success: true, message: "User found",
+            data: { ...user, followers_count, following_count },
+        });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: "Failed", error: error.message });
+    }
+};
+
+export const updateUserProfile = async (req: Request, res: Response): Promise<any> => {
+    const userId = (req as any).user_id;
+    const { avatar_url, banner_url } = req.body;
+    try {
+        const data: Record<string, string> = {};
+        if (avatar_url !== undefined) data.avatar_url = avatar_url;
+        if (banner_url !== undefined) data.banner_url = banner_url;
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data,
+            select: { id: true, username: true, avatar_url: true, banner_url: true },
+        });
+        return res.status(200).json({ success: true, message: "Profile updated", data: user });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: "Update failed", error: error.message });
+    }
+};
+
 export const searchUsers = async (req: Request, res: Response): Promise<any> => {
     const q = (req.query.q as string ?? "").trim();
     if (!q) return res.status(200).json({ success: true, message: "No query", data: [] });
     try {
         const users = await prisma.user.findMany({
             where: { username: { contains: q } },
-            select: { id: true, username: true, email: true },
+            select: { id: true, username: true, email: true, avatar_url: true },
             take: 20,
         });
         return res.status(200).json({ success: true, message: "Users found", data: users });

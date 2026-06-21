@@ -28,14 +28,9 @@ export default function SettingsPage() {
       <Navbar />
 
       <div className="flex pt-14">
-        <div
-          className="hidden md:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-white/[0.06] overflow-y-auto"
-          style={{ background: "#0d1020" }}
-        >
-          <LeftSidebar />
-        </div>
+        <LeftSidebar />
 
-        <main className="flex-1 md:ml-56 px-4 py-6 min-h-[calc(100vh-3.5rem)]">
+        <main className="flex-1 sidebar-ml px-4 py-6 min-h-[calc(100vh-3.5rem)]">
           <div className="max-w-xl mx-auto">
 
             {/* Header */}

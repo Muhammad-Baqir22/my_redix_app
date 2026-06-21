@@ -8,10 +8,12 @@ import { FeedPost, ApiResponse } from "@/types/api";
 import { apiFetch, getToken } from "@/lib/api";
 import { communityColor, formatCount } from "@/lib/utils";
 
-export default function PostCard({ post }: { post: FeedPost }) {
+export default function PostCard({ post, initialSaved = false }: { post: FeedPost; initialSaved?: boolean }) {
 
   const [userVote, setUserVote] = useState<-1 | 0 | 1>(0);
   const [total, setTotal]       = useState(post.votes);
+  const [saved, setSaved]       = useState(initialSaved);
+  const [savingInProgress, setSavingInProgress] = useState(false);
 
   const color = post.subreddit_name ? communityColor(post.subreddit_name) : "#7c3aed";
 
@@ -95,9 +97,9 @@ export default function PostCard({ post }: { post: FeedPost }) {
           )}
           <span className="text-gray-500 text-xs">
             by{" "}
-            <span className="hover:text-purple-400 cursor-pointer transition-colors">
+            <Link href={`/profile/${post.username}`} className="hover:text-purple-400 transition-colors">
               u/{post.username}
-            </span>
+            </Link>
           </span>
         </div>
 
@@ -139,9 +141,30 @@ export default function PostCard({ post }: { post: FeedPost }) {
             <Share2 size={14} />
             Share
           </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-500 text-xs font-medium hover:bg-white/[0.07] hover:text-gray-300 transition-all duration-150">
-            <Bookmark size={14} />
-            Save
+          <button
+            disabled={savingInProgress}
+            onClick={async () => {
+              setSavingInProgress(true);
+              try {
+                if (saved) {
+                  await apiFetch("/api/saved/", { method: "DELETE", body: JSON.stringify({ post_id: post.id }) });
+                  setSaved(false);
+                  toast.success("Removed from saved");
+                } else {
+                  await apiFetch("/api/saved/", { method: "POST", body: JSON.stringify({ post_id: post.id }) });
+                  setSaved(true);
+                  toast.success("Post saved!");
+                }
+              } catch {
+                toast.error("Something went wrong");
+              } finally {
+                setSavingInProgress(false);
+              }
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-white/[0.07] transition-all duration-150 ${saved ? "text-purple-400" : "text-gray-500 hover:text-gray-300"}`}
+          >
+            <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
+            {saved ? "Saved" : "Save"}
           </button>
         </div>
       </div>

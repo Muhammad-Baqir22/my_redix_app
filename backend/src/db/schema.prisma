@@ -20,6 +20,8 @@ model User {
   email         String        @unique
   password_hash String
   fcm_token     String?
+  avatar_url    String?
+  banner_url    String?
   created_at    DateTime      @default(now())
 
   subreddits    Subreddit[]   @relation("UserSubreddits")
@@ -34,6 +36,7 @@ model User {
 
   sentMessages     Message[] @relation("SenderUser")
   receivedMessages Message[] @relation("ReciverUser")
+  savedPosts       SavedPost[]
   
 }
 
@@ -61,9 +64,10 @@ model Post {
   subreddit_id String?
 
   author       User         @relation(fields: [user_id], references: [id])
-  subreddit    Subreddit?    @relation(fields: [subreddit_id], references: [id])
+  subreddit    Subreddit?   @relation(fields: [subreddit_id], references: [id])
   comments     Comment[]
   votes        PostVote[]
+  savedBy      SavedPost[]
 }
 
 model Comment {
@@ -138,6 +142,18 @@ model Notification{
   created_at DateTime @default(now())
 
   user         User     @relation("NotificationUser",fields: [user_id], references: [id])
+}
+
+model SavedPost {
+  id         String   @id @default(uuid())
+  user_id    String
+  post_id    String
+  created_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id])
+  post       Post     @relation(fields: [post_id], references: [id])
+
+  @@unique([user_id, post_id])
 }
 
 model Message {

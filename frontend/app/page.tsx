@@ -10,14 +10,9 @@ export default function HomePage() {
       <Navbar />
 
       <div className="flex pt-14">
-        <div
-          className="hidden md:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-white/[0.06] overflow-y-auto"
-          style={{ background: "#0d1020" }}
-        >
-          <LeftSidebar />
-        </div>
+        <LeftSidebar />
 
-        <main className="flex-1 md:ml-56 lg:mr-72 min-h-[calc(100vh-3.5rem)] px-4 py-5">
+        <main className="flex-1 sidebar-ml lg:mr-72 min-h-[calc(100vh-3.5rem)] px-4 py-5">
           <div className="max-w-2xl mx-auto flex flex-col gap-3">
             <CreatePostBox />
             <FeedList />

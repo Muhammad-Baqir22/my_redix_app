@@ -22,40 +22,33 @@ export const postcomment = async (req: Request, res: TypedResponse<ApiResponse<c
                 parent_comment_id: parent_id && parent_id !== "" ? parent_id : null
             }
         });
-        const usercommented = await prisma.post.findUnique({
-            where: { id: post_id },
-            include: {
-                author: {
-                    select: {
-                        id: true,
-                        fcm_token: true
-                    }
-                }
-            }
-        })
-        const user = await prisma.user.findUnique({ where: { id: user_id } })
-        if (usercommented?.author.fcm_token) {
-            const message = {
-                notification: {
-                    title: "New Comment on your Post",
-                    body: `${user?.username} commented on your post : ${content}`
-                },
-                token: usercommented.author.fcm_token
-            }
-            try {
-                await admin.messaging().send(message)
-                console.log("Notification send successfully")
-            } catch (error) {
-                console.log("Error sending notification", error)
-            }
+        const [postWithAuthor, commenter] = await Promise.all([
+            prisma.post.findUnique({
+                where: { id: post_id },
+                include: { author: { select: { id: true, username: true, fcm_token: true } } },
+            }),
+            prisma.user.findUnique({ where: { id: user_id }, select: { username: true } }),
+        ]);
+
+        // Notify post author (unless they commented on their own post)
+        if (postWithAuthor && postWithAuthor.author.id !== user_id) {
             await prisma.notification.create({
                 data: {
-                    user_id: usercommented.author.id,
-                    type: 'comment',
-                    message: `${user?.username} Comment on you post: ${content}`,
-                    Read: false
-                }
-            })
+                    user_id: postWithAuthor.author.id,
+                    type: "comment",
+                    message: `u/${commenter?.username ?? "Someone"} commented on your post`,
+                    Read: false,
+                },
+            });
+
+            if (postWithAuthor.author.fcm_token) {
+                try {
+                    await admin.messaging().send({
+                        notification: { title: "New Comment on your Post", body: `${commenter?.username} commented on your post: ${content}` },
+                        token: postWithAuthor.author.fcm_token,
+                    });
+                } catch { /* ignore FCM errors */ }
+            }
         }
         return res.status(201).json({ success: true, message: "Comment created successfully", data: comment });
     } catch (error: any) {

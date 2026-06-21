@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Responsive sidebar margin — controlled by --sidebar-ml CSS variable */
+@media (min-width: 768px) {
+  .sidebar-ml {
+    margin-left: var(--sidebar-ml, 224px);
+    transition: margin-left 0.3s ease;
+  }
+}

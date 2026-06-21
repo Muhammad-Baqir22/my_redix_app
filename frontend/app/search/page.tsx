@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Search, Users, Hash, AlertCircle, UserPlus } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
@@ -12,6 +13,7 @@ interface UserResult {
   id: string;
   username: string;
   email: string;
+  avatar_url?: string | null;
 }
 
 interface SubredditResult {
@@ -87,14 +89,9 @@ export default function SearchPage() {
       <Navbar />
 
       <div className="flex pt-14">
-        <div
-          className="hidden md:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-white/[0.06] overflow-y-auto"
-          style={{ background: "#0d1020" }}
-        >
-          <LeftSidebar />
-        </div>
+        <LeftSidebar />
 
-        <main className="flex-1 md:ml-56 px-4 py-6 min-h-[calc(100vh-3.5rem)]">
+        <main className="flex-1 sidebar-ml px-4 py-6 min-h-[calc(100vh-3.5rem)]">
           <div className="max-w-2xl mx-auto">
 
             {/* Header */}
@@ -167,22 +164,26 @@ export default function SearchPage() {
                     ) : (
                       <div className="flex flex-col gap-3">
                         {users.map((user) => (
-                          <div
+                          <Link
                             key={user.id}
-                            className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/30 transition-all duration-200"
+                            href={`/profile/${user.username}`}
+                            className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/30 transition-all duration-200 cursor-pointer"
                             style={{ background: "rgba(255,255,255,0.025)" }}
                           >
                             <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                              style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+                              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                              style={user.avatar_url ? undefined : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
                             >
-                              {user.username[0].toUpperCase()}
+                              {user.avatar_url
+                                // eslint-disable-next-line @next/next/no-img-element
+                                ? <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                                : user.username[0].toUpperCase()
+                              }
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-white font-semibold text-sm truncate">u/{user.username}</p>
-                              <p className="text-gray-500 text-xs truncate">{user.email}</p>
                             </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     )}
