@@ -194,7 +194,10 @@ export default function MessagesPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let mqttClient: any;
     import("mqtt").then(({ default: mqttLib }) => {
-      mqttClient = mqttLib.connect("ws://localhost:1883", { username: mqttUsername, password: token });
+      const mqttWsUrl = process.env.NEXT_PUBLIC_MQTT_WS_URL ?? "ws://localhost:1883";
+      const mqttUser  = process.env.NEXT_PUBLIC_MQTT_USERNAME ?? mqttUsername;
+      const mqttPass  = process.env.NEXT_PUBLIC_MQTT_PASSWORD ?? token;
+      mqttClient = mqttLib.connect(mqttWsUrl, { username: mqttUser, password: mqttPass });
       mqttClient.on("connect", () => { mqttClient.subscribe(`msg/${myId}/#`); });
       mqttClient.on("message", (_topic: string, payload: Buffer) => {
         try {

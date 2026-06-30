@@ -1,21 +1,15 @@
 import mqtt from 'mqtt'
-import Jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import prisma from "../db/prismaclient";
 dotenv.config();
-const brokerUrl = "mqtt://localhost:1884";
-const id = "backenduser";
-const email = "backenduser@gmail.com"
-const name = "backenduser";
-const token = Jwt.sign({id:id,email:email,sub:name},process.env.JWT_SECRET!,{expiresIn:'2d'});
-const options = {
 
- username: name,
-  password: token,
+const brokerUrl = process.env.MQTT_BROKER_URL ?? "mqtt://localhost:1884";
+const options = {
+  username: process.env.MQTT_USERNAME ?? "backenduser",
+  password: process.env.MQTT_PASSWORD ?? "backenduser",
 };
 
-
-const client = mqtt.connect(brokerUrl,options);
+const client = mqtt.connect(brokerUrl, options);
 
 client.on('connect',()=>{
     console.log("Mqtt Connencted")
