@@ -1,12 +1,11 @@
 import admin from 'firebase-admin';
-import { readFileSync } from 'fs';
 
-const serviceAccount = JSON.parse(
-  readFileSync('./myredditapp-1f3ad-firebase-adminsdk-fbsvc-9094b3e295.json', 'utf8')
-);
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT ?? '{}');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
 
 export default admin;
