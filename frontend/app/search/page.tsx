@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, Users, Hash, AlertCircle, UserPlus } from "lucide-react";
@@ -35,7 +35,7 @@ function SkeletonCard() {
   );
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const router       = useRouter();
   const query        = searchParams.get("q") ?? "";
@@ -244,5 +244,13 @@ export default function SearchPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchContent />
+    </Suspense>
   );
 }
