@@ -1,19 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, ArrowDown, MessageSquare, Share2, Bookmark } from "lucide-react";
+import { ArrowUp, ArrowDown, MessageSquare, Share2, Bookmark, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { FeedPost, ApiResponse } from "@/types/api";
 import { apiFetch, getToken } from "@/lib/api";
 import { communityColor, formatCount } from "@/lib/utils";
 
-export default function PostCard({ post, initialSaved = false }: { post: FeedPost; initialSaved?: boolean }) {
+export default function PostCard({ post, initialSaved = false, isAdmin = false }: { post: FeedPost; initialSaved?: boolean; isAdmin?: boolean }) {
 
   const [userVote, setUserVote] = useState<-1 | 0 | 1>(0);
   const [total, setTotal]       = useState(post.votes);
   const [saved, setSaved]       = useState(initialSaved);
   const [savingInProgress, setSavingInProgress] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleted, setDeleted]   = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") ?? "" : "";
+  const canDelete = !!userId && (post.user_id === userId || isAdmin);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
+
+  const handleDelete = async () => {
+    setMenuOpen(false);
+    try {
+      await apiFetch<ApiResponse<unknown>>(`/api/post/${post.id}`, { method: "DELETE" });
+      toast.success("Post deleted");
+      setDeleted(true);
+    } catch {
+      toast.error("Failed to delete post");
+    }
+  };
+
+  if (deleted) return null;
 
   const color = post.subreddit_name ? communityColor(post.subreddit_name) : "#7c3aed";
 
@@ -126,7 +154,7 @@ export default function PostCard({ post, initialSaved = false }: { post: FeedPos
         )}
 
         {/* Actions */}
-        <div className="flex items-center gap-0.5 mt-1 -ml-1.5">
+        <div className="flex items-center gap-0.5 mt-1 -ml-1.5 relative">
           <Link
             href={`/post/${post.id}`}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-500 text-xs font-medium hover:bg-white/[0.07] hover:text-gray-300 transition-all duration-150"
@@ -166,6 +194,32 @@ export default function PostCard({ post, initialSaved = false }: { post: FeedPos
             <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
             {saved ? "Saved" : "Save"}
           </button>
+
+          {/* 3-dot menu — only visible to post author or community admin */}
+          {canDelete && (
+            <div ref={menuRef} className="ml-auto relative">
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-white/[0.07] transition-all duration-150"
+              >
+                <MoreHorizontal size={15} />
+              </button>
+              {menuOpen && (
+                <div
+                  className="absolute right-0 bottom-full mb-1 w-36 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-20"
+                  style={{ background: "#141728" }}
+                >
+                  <button
+                    onClick={handleDelete}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-red-400 text-sm hover:bg-red-500/10 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                    Delete post
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </article>

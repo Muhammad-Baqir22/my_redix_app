@@ -114,6 +114,21 @@ router.post("/send", tokenVerify, async (req, res): Promise<any> => {
   }
 });
 
+/* ── Delete a message ── */
+router.delete("/message/:id", tokenVerify, async (req, res): Promise<any> => {
+  const userId = (req as any).user_id;
+  const { id } = req.params;
+  try {
+    const message = await prisma.message.findUnique({ where: { id } });
+    if (!message) return res.status(404).json({ success: false, message: "Message not found" });
+    if (message.senderId !== userId) return res.status(403).json({ success: false, message: "Not authorized" });
+    await prisma.message.delete({ where: { id } });
+    return res.json({ success: true, message: "Message deleted" });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 /* ── Legacy endpoints (kept for compatibility) ── */
 router.get("/history/private/:user1/:user2", async (req, res) => {
   const { user1, user2 } = req.params;

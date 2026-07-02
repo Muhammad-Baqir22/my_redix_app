@@ -326,6 +326,38 @@ export const getpostbyusername = async (req: Request, res: TypedResponse<ApiResp
     }
 };
 
+export const deletePost = async (req: Request, res: Response): Promise<any> => {
+    const post_id = req.params.id;
+    const user_id = (req as any).user_id;
+    try {
+        const post = await prisma.post.findUnique({
+            where: { id: post_id },
+            include: { subreddit: { select: { created_by: true } } },
+        });
+        if (!post) return res.status(404).json({ success: false, message: "Post not found" });
+
+        const isAuthor         = post.user_id === user_id;
+        const isCommunityAdmin = post.subreddit?.created_by === user_id;
+        if (!isAuthor && !isCommunityAdmin)
+            return res.status(403).json({ success: false, message: "Not authorized" });
+
+        const comments   = await prisma.comment.findMany({ where: { post_id }, select: { id: true } });
+        const commentIds = comments.map((c: any) => c.id);
+        if (commentIds.length > 0) {
+            await prisma.comment.updateMany({ where: { post_id, parent_comment_id: { not: null } }, data: { parent_comment_id: null } });
+            await prisma.commentVote.deleteMany({ where: { comment_id: { in: commentIds } } });
+            await prisma.comment.deleteMany({ where: { post_id } });
+        }
+        await prisma.postVote.deleteMany({ where: { post_id } });
+        await prisma.savedPost.deleteMany({ where: { post_id } });
+        await prisma.post.delete({ where: { id: post_id } });
+
+        return res.status(200).json({ success: true, message: "Post deleted" });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: "Failed to delete post", error: error.message });
+    }
+};
+
 //COMPLETED
 export const getpostbyid = async (req: Request, res: TypedResponse<ApiResponse<Post>>): Promise<any> => {
     const post_id = req.params.id;

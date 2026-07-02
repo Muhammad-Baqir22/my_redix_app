@@ -26,6 +26,7 @@ export default function CommunitiesPage() {
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ name: "", description: "" });
+  const [userId, setUserId] = useState("");
 
   const load = () => {
     apiFetch<ApiResponse<Subreddit[]>>("/api/subreddit/subs/")
@@ -36,6 +37,7 @@ export default function CommunitiesPage() {
 
   useEffect(() => {
     if (!getToken()) { router.push("/login"); return; }
+    setUserId(localStorage.getItem("userId") ?? "");
     load();
   }, [router]);
 
@@ -150,19 +152,25 @@ export default function CommunitiesPage() {
                     </div>
                   </Link>
 
-                  {/* Join/Joined button */}
-                  <button
-                    onClick={() => toggleFollow(sub)}
-                    className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-3 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0 ${
-                      sub.is_following ? "bg-white/[0.06] text-gray-400" : "text-white"
-                    }`}
-                    style={sub.is_following ? undefined : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
-                  >
-                    {sub.is_following
-                      ? <><Check size={11} /><span>Joined</span></>
-                      : <><UserPlus size={11} /><span>Join</span></>
-                    }
-                  </button>
+                  {/* Join/Joined button — hidden for the community creator */}
+                  {sub.created_by === userId ? (
+                    <span className="text-xs font-semibold text-purple-400 border border-purple-500/40 px-2.5 py-1.5 rounded-lg flex-shrink-0">
+                      Admin
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => toggleFollow(sub)}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-3 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0 ${
+                        sub.is_following ? "bg-white/[0.06] text-gray-400" : "text-white"
+                      }`}
+                      style={sub.is_following ? undefined : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
+                    >
+                      {sub.is_following
+                        ? <><Check size={11} /><span>Joined</span></>
+                        : <><UserPlus size={11} /><span>Join</span></>
+                      }
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

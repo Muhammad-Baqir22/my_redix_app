@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Search, Send, Phone, Video, MoreVertical,
   Image as ImageIcon, Paperclip, Plus, X,
-  MessageSquare, Edit3, Users,
+  MessageSquare, Users, Trash2,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
@@ -103,6 +103,7 @@ export default function MessagesPage() {
   /* input */
   const [input,          setInput]          = useState("");
   const [sending,        setSending]        = useState(false);
+  const [msgMenu,        setMsgMenu]        = useState<string | null>(null);
 
   /* mobile */
   const [showMobileChat, setShowMobileChat] = useState(false);
@@ -282,6 +283,16 @@ export default function MessagesPage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  };
+
+  const deleteMessage = async (msgId: string) => {
+    setMsgMenu(null);
+    try {
+      await apiFetch<ApiResponse<unknown>>(`/api/chat/message/${msgId}`, { method: "DELETE" });
+      setMessages((prev) => prev.filter((m) => m.id !== msgId));
+    } catch {
+      // silently ignore
+    }
   };
 
   const messageGroups = groupByDay(messages);
@@ -507,7 +518,7 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={msg.id}
-                          className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"} ${idx > 0 ? "mt-1" : ""}`}
+                          className={`flex items-end gap-1.5 ${isMe ? "justify-end" : "justify-start"} ${idx > 0 ? "mt-1" : ""} group`}
                         >
                           {!isMe && (
                             <div className="w-7 flex-shrink-0">
@@ -518,13 +529,40 @@ export default function MessagesPage() {
                             {showAvatar && !isMe && (
                               <p className="text-purple-400 text-xs font-semibold mb-1 ml-1">{msg.sender.username}</p>
                             )}
-                            <div
-                              className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isMe ? "rounded-br-sm text-white" : "rounded-bl-sm text-gray-200"}`}
-                              style={isMe
-                                ? { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }
-                                : { background: "rgba(255,255,255,0.06)" }}
-                            >
-                              {msg.content}
+                            <div className={`flex items-end gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                              <div
+                                className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isMe ? "rounded-br-sm text-white" : "rounded-bl-sm text-gray-200"}`}
+                                style={isMe
+                                  ? { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }
+                                  : { background: "rgba(255,255,255,0.06)" }}
+                              >
+                                {msg.content}
+                              </div>
+                              {/* 3-dot delete — own messages only */}
+                              {isMe && !msg.id.startsWith("tmp-") && (
+                                <div className="relative flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => setMsgMenu(msgMenu === msg.id ? null : msg.id)}
+                                    className="w-6 h-6 flex items-center justify-center rounded-full text-gray-600 hover:text-gray-300 hover:bg-white/[0.08] transition-all"
+                                  >
+                                    <MoreVertical size={13} />
+                                  </button>
+                                  {msgMenu === msg.id && (
+                                    <div
+                                      className="absolute right-0 bottom-full mb-1 w-32 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-30"
+                                      style={{ background: "#141728" }}
+                                    >
+                                      <button
+                                        onClick={() => deleteMessage(msg.id)}
+                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-red-400 text-xs hover:bg-red-500/10 transition-colors"
+                                      >
+                                        <Trash2 size={13} />
+                                        Delete
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <p className="text-gray-700 text-[10px] mt-0.5 mx-1">
                               {formatTime(msg.createdAt)}
