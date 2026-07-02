@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 
 // ─── Validation schema ────────────────────────────────────────────────────────
 const signupSchema = z
@@ -114,6 +116,27 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+      const json = await res.json();
+      if (!json.success) { toast.error(json.message ?? "Google sign-in failed"); return; }
+      localStorage.setItem("token", json.data.token);
+      localStorage.setItem("username", json.data.user.username);
+      localStorage.setItem("email", json.data.user.email);
+      localStorage.setItem("userId", json.data.user.id);
+      router.push("/");
+    } catch {
+      toast.error("Google sign-in failed. Please try again.");
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -202,6 +225,7 @@ export default function SignupPage() {
               {/* ── Google button ── */}
               <button
                 type="button"
+                onClick={handleGoogleSignIn}
                 aria-label="Continue with Google"
                 className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-white/[0.1] text-gray-300 text-sm font-medium transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
               >

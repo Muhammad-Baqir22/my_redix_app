@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
 import prisma from "../db/prismaclient";
 import Jwt from 'jsonwebtoken';
+import admin from '../firebase';
 
 import { ApiResponse} from "../ResponseModel/api.ResponseModel";
 import {AuthResponse} from "../ResponseModel/auth.ResponseModel";
@@ -116,11 +117,46 @@ export const loginController = async (req: Request, res: TypedResponse<ApiRespon
         }
         return res.status(200).json({success: true, message: "Login successFull", data:{user: { id: user.id,username:user.username, email: user.email },token} });
     } catch (error:any) {
-        res.status(500).json({ 
+        res.status(500).json({
             success:false,
             message: "Login Failed",
             error:error.message,
     });
+    }
+};
+
+export const googleAuthController = async (req: Request, res: Response): Promise<any> => {
+    const { idToken } = req.body;
+    if (!idToken) return res.status(400).json({ success: false, message: "ID token required" });
+
+    try {
+        const decoded = await admin.auth().verifyIdToken(idToken);
+        const { email, name, picture, uid } = decoded;
+
+        if (!email) return res.status(400).json({ success: false, message: "No email in Google account" });
+
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user) {
+            const username = (name ?? email.split("@")[0]).replace(/\s+/g, "").toLowerCase() + "_" + uid.slice(0, 5);
+            user = await prisma.user.create({
+                data: { email, username, password_hash: "", avatar_url: picture ?? null },
+            });
+        }
+
+        const token = Jwt.sign(
+            { id: user.id, email: user.email, sub: user.id },
+            process.env.JWT_SECRET!,
+            { algorithm: "HS256", expiresIn: "2d" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Google login successful",
+            data: { user: { id: user.id, username: user.username, email: user.email }, token },
+        });
+    } catch (error: any) {
+        return res.status(401).json({ success: false, message: "Invalid Google token", error: error.message });
     }
 };
 
