@@ -122,7 +122,7 @@ export default function Navbar() {
       </Link>
 
       {/* Search with live dropdown */}
-      <div ref={wrapperRef} className="relative flex-shrink-0 w-56 xl:w-80">
+      <div ref={wrapperRef} className="relative flex-1 min-w-0 max-w-[140px] sm:max-w-[224px] xl:max-w-[320px]">
         <form onSubmit={handleSubmit}>
           <div className="relative">
             <Search
