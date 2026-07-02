@@ -241,7 +241,8 @@ export default function PostPage() {
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
-        <main className="flex-1 sidebar-ml max-w-2xl mx-auto px-4 py-6">
+        <main className="flex-1 sidebar-ml min-h-[calc(100vh-3.5rem)]">
+        <div className="max-w-2xl mx-auto px-4 py-6 w-full">
         {loading ? (
           <PostDetailSkeleton />
         ) : error ? (
@@ -379,6 +380,7 @@ export default function PostPage() {
             )}
           </div>
         )}
+        </div>
         </main>
       </div>
     </div>
