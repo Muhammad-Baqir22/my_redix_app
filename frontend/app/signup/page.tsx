@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 // ─── Validation schema ────────────────────────────────────────────────────────
@@ -116,9 +116,9 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
+  useEffect(() => {
+    getRedirectResult(auth).then(async (result) => {
+      if (!result) return;
       const idToken = await result.user.getIdToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/api/auth/google`, {
         method: "POST",
@@ -132,9 +132,13 @@ export default function SignupPage() {
       localStorage.setItem("email", json.data.user.email);
       localStorage.setItem("userId", json.data.user.id);
       router.push("/");
-    } catch {
-      toast.error("Google sign-in failed. Please try again.");
-    }
+    }).catch(() => toast.error("Google sign-in failed. Please try again."));
+  }, [router]);
+
+  const handleGoogleSignIn = () => {
+    signInWithRedirect(auth, googleProvider).catch(() =>
+      toast.error("Google sign-in failed. Please try again.")
+    );
   };
 
   const {
