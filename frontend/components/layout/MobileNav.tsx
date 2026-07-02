@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, Plus, MessageSquare, User } from "lucide-react";
+import { Home, Hash, Plus, MessageSquare, User } from "lucide-react";
 
 const NAV = [
-  { icon: Home,          href: "/",         label: "Home" },
-  { icon: TrendingUp,    href: "/popular",  label: "Popular" },
+  { icon: Home,          href: "/",            label: "Home" },
+  { icon: Hash,          href: "/communities", label: "Communities" },
   { icon: Plus,          href: "/create-post", label: "Post" },
-  { icon: MessageSquare, href: "/messages", label: "Messages" },
-  { icon: User,          href: "/profile",  label: "Profile" },
+  { icon: MessageSquare, href: "/messages",    label: "Messages" },
+  { icon: User,          href: "/profile",     label: "Profile" },
 ];
 
 export default function MobileNav() {
