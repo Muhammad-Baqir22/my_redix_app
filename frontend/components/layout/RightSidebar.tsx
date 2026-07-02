@@ -98,7 +98,7 @@ export default function RightSidebar() {
                       onClick={() => follow(sub)}
                       className="text-xs font-semibold text-purple-400 border border-purple-500/40 hover:bg-purple-500/15 px-3 py-1 rounded-lg transition-all duration-150 flex-shrink-0"
                     >
-                      Post
+                      Join
                     </button>
                   </div>
                 );
@@ -126,7 +126,7 @@ export default function RightSidebar() {
             {label}
           </Link>
         ))}
-        <p className="text-gray-700 text-xs w-full mt-1">© 2024 RediX Ecosystem Inc.</p>
+        <p className="text-gray-700 text-xs w-full mt-1">© 2026 RediX Ecosystem Inc.</p>
       </div>
     </aside>
   );
