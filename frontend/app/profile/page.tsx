@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Settings, ArrowUp, ArrowDown, MessageSquare, Share2, X } from "lucide-react";
+import { Settings, ArrowUp, ArrowDown, MessageSquare, Share2, X, Trash2 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
@@ -13,8 +13,9 @@ import { formatCount, timeAgo } from "@/lib/utils";
 
 /* ─── Mini post card for profile feed ─── */
 function ProfilePostCard({ post }: { post: FeedPost }) {
-  const [vote,  setVote]  = useState<-1 | 0 | 1>(0);
-  const [total, setTotal] = useState(post.votes);
+  const [vote,    setVote]    = useState<-1 | 0 | 1>(0);
+  const [total,   setTotal]   = useState(post.votes);
+  const [deleted, setDeleted] = useState(false);
 
   const handleVote = async (type: 1 | -1) => {
     const next = (vote === type ? 0 : type) as -1 | 0 | 1;
@@ -36,6 +37,18 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
     toast.success("Link copied!");
   };
+
+  const handleDelete = async () => {
+    try {
+      await apiFetch<ApiResponse<unknown>>(`/api/post/${post.id}`, { method: "DELETE" });
+      toast.success("Post deleted");
+      setDeleted(true);
+    } catch {
+      toast.error("Failed to delete post");
+    }
+  };
+
+  if (deleted) return null;
 
   return (
     <article
@@ -98,6 +111,13 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
           >
             <Share2 size={12} />
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-red-500/60 text-xs hover:bg-red-500/10 hover:text-red-400 transition-all ml-1"
+          >
+            <Trash2 size={12} />
           </button>
         </div>
       </div>

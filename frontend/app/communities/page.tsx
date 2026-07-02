@@ -26,7 +26,7 @@ export default function CommunitiesPage() {
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ name: "", description: "" });
-  const [userId, setUserId] = useState("");
+  const userId = typeof window !== "undefined" ? (localStorage.getItem("userId") ?? "") : "";
 
   const load = () => {
     apiFetch<ApiResponse<Subreddit[]>>("/api/subreddit/subs/")
@@ -37,7 +37,6 @@ export default function CommunitiesPage() {
 
   useEffect(() => {
     if (!getToken()) { router.push("/login"); return; }
-    setUserId(localStorage.getItem("userId") ?? "");
     load();
   }, [router]);
 

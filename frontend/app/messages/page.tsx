@@ -104,6 +104,8 @@ export default function MessagesPage() {
   const [input,          setInput]          = useState("");
   const [sending,        setSending]        = useState(false);
   const [msgMenu,        setMsgMenu]        = useState<string | null>(null);
+  const [chatMenuOpen,   setChatMenuOpen]   = useState(false);
+  const chatMenuRef = useRef<HTMLDivElement>(null);
 
   /* mobile */
   const [showMobileChat, setShowMobileChat] = useState(false);
@@ -148,12 +150,11 @@ export default function MessagesPage() {
     });
   }, []);
 
-  /* ── Close dropdown on outside click ── */
+  /* ── Close dropdowns on outside click ── */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
-        setShowDrop(false);
-      }
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) setShowDrop(false);
+      if (chatMenuRef.current && !chatMenuRef.current.contains(e.target as Node)) setChatMenuOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -283,6 +284,20 @@ export default function MessagesPage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  };
+
+  const deleteConversation = async () => {
+    if (!activePartner) return;
+    setChatMenuOpen(false);
+    try {
+      await apiFetch<ApiResponse<unknown>>(`/api/chat/conversation/${activePartner.id}`, { method: "DELETE" });
+      setMessages([]);
+      setConversations((prev) => prev.filter((c) => c.partner.id !== activePartner.id));
+      setActivePartner(null);
+      setShowMobileChat(false);
+    } catch {
+      // silently ignore
+    }
   };
 
   const deleteMessage = async (msgId: string) => {
@@ -478,11 +493,33 @@ export default function MessagesPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  {[Search, Phone, Video, MoreVertical].map((Icon, i) => (
+                  {[Search, Phone, Video].map((Icon, i) => (
                     <button key={i} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all">
                       <Icon size={15} />
                     </button>
                   ))}
+                  <div ref={chatMenuRef} className="relative">
+                    <button
+                      onClick={() => setChatMenuOpen((v) => !v)}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all"
+                    >
+                      <MoreVertical size={15} />
+                    </button>
+                    {chatMenuOpen && (
+                      <div
+                        className="absolute right-0 top-full mt-1 w-44 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-30"
+                        style={{ background: "#141728" }}
+                      >
+                        <button
+                          onClick={deleteConversation}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-red-400 text-sm hover:bg-red-500/10 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                          Delete conversation
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

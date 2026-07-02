@@ -114,6 +114,25 @@ router.post("/send", tokenVerify, async (req, res): Promise<any> => {
   }
 });
 
+/* ── Delete entire conversation ── */
+router.delete("/conversation/:partnerId", tokenVerify, async (req, res): Promise<any> => {
+  const userId = (req as any).user_id;
+  const { partnerId } = req.params;
+  try {
+    await prisma.message.deleteMany({
+      where: {
+        OR: [
+          { senderId: userId, receiverId: partnerId },
+          { senderId: partnerId, receiverId: userId },
+        ],
+      },
+    });
+    return res.json({ success: true, message: "Conversation deleted" });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 /* ── Delete a message ── */
 router.delete("/message/:id", tokenVerify, async (req, res): Promise<any> => {
   const userId = (req as any).user_id;
