@@ -89,9 +89,9 @@ export default function PostCard({ post, initialSaved = false }: { post: FeedPos
               >
                 {post.subreddit_name.charAt(0).toUpperCase()}
               </div>
-              <span className="text-white text-xs font-semibold hover:text-purple-300 transition-colors cursor-pointer">
+              <Link href={`/community/${post.subreddit_name}`} className="text-white text-xs font-semibold hover:text-purple-300 transition-colors">
                 r/{post.subreddit_name}
-              </span>
+              </Link>
               <span className="text-gray-700 text-xs">•</span>
             </>
           )}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ImagePlus, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,8 +11,9 @@ import { communityColor } from "@/lib/utils";
 import Navbar from "@/components/layout/Navbar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 
-export default function CreatePostPage() {
+function CreatePostForm() {
   const router   = useRouter();
+  const params   = useSearchParams();
   const fileRef  = useRef<HTMLInputElement>(null);
 
   const [title,       setTitle]       = useState("");
@@ -27,7 +28,14 @@ export default function CreatePostPage() {
   useEffect(() => {
     if (!getToken()) { router.push("/login"); return; }
     apiFetch<ApiResponse<ApiSubreddit[]>>("/api/subreddit/subs/")
-      .then((res) => setSubreddits(res.data ?? []))
+      .then((res) => {
+        const list = res.data ?? [];
+        setSubreddits(list);
+        const communityId = params.get("communityId");
+        if (communityId && list.some((s) => s.id === communityId)) {
+          setSelectedSub(communityId);
+        }
+      })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -258,5 +266,13 @@ export default function CreatePostPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function CreatePostPage() {
+  return (
+    <Suspense>
+      <CreatePostForm />
+    </Suspense>
   );
 }
