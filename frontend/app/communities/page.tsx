@@ -78,11 +78,11 @@ export default function CommunitiesPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: "#0b0e1a" }}>
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
-        <main className="flex-1 sidebar-ml px-3 sm:px-4 py-5 min-h-[calc(100vh-3.5rem)] pb-20 md:pb-6">
+        <main className="flex-1 sidebar-ml px-3 sm:px-4 py-5 min-h-[calc(100vh-3.5rem)] pb-20 md:pb-6 overflow-x-hidden">
           <div className="max-w-2xl mx-auto">
 
             {/* Header */}
@@ -140,18 +140,13 @@ export default function CommunitiesPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-white font-semibold text-sm truncate">r/{sub.name}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-gray-600 text-xs flex items-center gap-1 flex-shrink-0">
-                          <Users size={10} />
-                          {sub.member_count}
-                        </span>
-                        {sub.description && (
-                          <>
-                            <span className="text-gray-700 text-xs">·</span>
-                            <p className="text-gray-500 text-xs truncate">{sub.description}</p>
-                          </>
-                        )}
-                      </div>
+                      <span className="text-gray-600 text-xs flex items-center gap-1 mt-0.5">
+                        <Users size={10} />
+                        {sub.member_count} members
+                      </span>
+                      {sub.description && (
+                        <p className="text-gray-500 text-xs truncate mt-0.5">{sub.description}</p>
+                      )}
                     </div>
                   </Link>
 
