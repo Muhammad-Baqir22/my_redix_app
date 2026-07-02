@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  ArrowLeft, ArrowUp, ArrowDown, MessageSquare, Share2, Send,
+  ArrowUp, ArrowDown, MessageSquare, Share2, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { BackendComment, PostDetail, ApiResponse } from "@/types/api";
 import { apiFetch, getToken } from "@/lib/api";
 import { communityColor, formatCount, timeAgo } from "@/lib/utils";
+import Navbar from "@/components/layout/Navbar";
+import LeftSidebar from "@/components/layout/LeftSidebar";
 
 /* ─── Comment vote ─── */
 async function voteComment(comment_id: string, vote_type: -1 | 0 | 1) {
@@ -237,24 +238,10 @@ export default function PostPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
-      {/* Navbar */}
-      <nav
-        className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 border-b border-white/[0.06]"
-        style={{ background: "#0d1020" }}
-      >
-        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft size={16} />
-          Back to feed
-        </Link>
-        <span
-          className="ml-4 text-xl font-black tracking-tight"
-          style={{ background: "linear-gradient(135deg, #a78bfa, #818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-        >
-          RediX
-        </span>
-      </nav>
-
-      <main className="pt-14 max-w-2xl mx-auto px-4 py-6">
+      <Navbar />
+      <div className="flex pt-14">
+        <LeftSidebar />
+        <main className="flex-1 sidebar-ml max-w-2xl mx-auto px-4 py-6">
         {loading ? (
           <PostDetailSkeleton />
         ) : error ? (
@@ -392,7 +379,8 @@ export default function PostPage() {
             )}
           </div>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
