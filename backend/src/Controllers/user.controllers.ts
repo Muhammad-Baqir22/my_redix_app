@@ -23,14 +23,12 @@ export const createUser = async (req: Request, res: Response) : Promise<any> => 
         });
         return res.status(201).json({ success: true,message: 'user Created', data: {user:{ id: user.id, username: user.username,email:user.email }} });
     } catch (error: any) {
+        console.error("createUser error:", error.message);
         return res.json({
             success: false,
             message: "Somethis wrong",
             error: error.message,
-
         });
-
-
     }
 };
 

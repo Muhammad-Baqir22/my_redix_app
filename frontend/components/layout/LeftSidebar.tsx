@@ -23,7 +23,7 @@ export default function LeftSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    const stored     = localStorage.getItem("sidebar-collapsed") === "1";
+    const stored = localStorage.getItem("sidebar-collapsed") === "1";
     setCollapsed(stored);
     document.documentElement.style.setProperty("--sidebar-ml", stored ? "56px" : "224px");
   }, []);
@@ -37,8 +37,8 @@ export default function LeftSidebar() {
 
   return (
     <div
-      className={`hidden md:flex flex-col fixed top-14 left-0 bottom-0 border-r border-white/[0.06] overflow-hidden transition-all duration-300 z-40 ${collapsed ? "w-14" : "w-56"}`}
-      style={{ background: "#0d1020" }}
+      className={`hidden md:flex flex-col fixed top-14 left-0 bottom-0 border-r border-[var(--border)] overflow-hidden transition-all duration-300 z-40 ${collapsed ? "w-14" : "w-56"}`}
+      style={{ background: "var(--bg-sidebar)" }}
     >
       <aside className="flex flex-col h-full py-3">
 
@@ -47,7 +47,7 @@ export default function LeftSidebar() {
           <button
             onClick={toggle}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all"
           >
             <Menu size={17} />
           </button>
@@ -67,12 +67,12 @@ export default function LeftSidebar() {
                 } ${
                   active
                     ? "bg-purple-600/20 text-purple-300"
-                    : "text-gray-400 hover:bg-white/[0.05] hover:text-white"
+                    : "text-[var(--text-2)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-1)]"
                 }`}
               >
                 <item.icon
                   size={18}
-                  className={`flex-shrink-0 ${active ? "text-purple-400" : "text-gray-500 group-hover:text-gray-300"}`}
+                  className={`flex-shrink-0 ${active ? "text-purple-400" : "text-[var(--text-3)] group-hover:text-[var(--text-2)]"}`}
                 />
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>
@@ -81,7 +81,7 @@ export default function LeftSidebar() {
         </nav>
 
         {/* Divider */}
-        <div className="my-2 h-px bg-white/[0.06] mx-2" />
+        <div className="my-2 h-px mx-2" style={{ background: "var(--border)" }} />
 
         {/* Bottom nav */}
         <nav className="flex flex-col gap-0.5 px-2">
@@ -97,12 +97,12 @@ export default function LeftSidebar() {
                 } ${
                   active
                     ? "bg-purple-600/20 text-purple-300"
-                    : "text-gray-400 hover:bg-white/[0.05] hover:text-white"
+                    : "text-[var(--text-2)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-1)]"
                 }`}
               >
                 <item.icon
                   size={18}
-                  className={`flex-shrink-0 ${active ? "text-purple-400" : "text-gray-500 group-hover:text-gray-300"}`}
+                  className={`flex-shrink-0 ${active ? "text-purple-400" : "text-[var(--text-3)] group-hover:text-[var(--text-2)]"}`}
                 />
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>

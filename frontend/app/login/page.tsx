@@ -11,7 +11,6 @@ import { toast, Toaster } from "sonner";
 import { signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
-// ─── Validation schema ────────────────────────────────────────────────────────
 const loginSchema = z.object({
   email: z.string().min(1, "Email or username is required"),
   password: z.string().min(1, "Password is required"),
@@ -20,7 +19,6 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// ─── Reusable field wrapper ───────────────────────────────────────────────────
 interface FieldProps {
   id: string;
   label: string;
@@ -31,7 +29,7 @@ interface FieldProps {
 function Field({ id, label, error, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-gray-300 select-none">
+      <label htmlFor={id} className="text-sm font-medium text-[var(--text-2)] select-none">
         {label}
       </label>
       {children}
@@ -45,19 +43,17 @@ function Field({ id, label, error, children }: FieldProps) {
   );
 }
 
-// ─── Input class helper ───────────────────────────────────────────────────────
 function inputCls(hasError: boolean) {
   return [
-    "w-full bg-white/[0.04] border rounded-xl px-4 py-2.5 text-white text-sm",
-    "placeholder-gray-600 outline-none transition-all duration-200",
-    "hover:border-white/20 focus:ring-2 focus:ring-purple-500/20",
+    "w-full bg-[var(--bg-input)] border rounded-xl px-4 py-2.5 text-[var(--text-1)] text-sm",
+    "placeholder-[var(--text-3)] outline-none transition-all duration-200",
+    "hover:border-[var(--border)] focus:ring-2 focus:ring-purple-500/20",
     hasError
       ? "border-red-500/60 focus:border-red-500"
-      : "border-white/[0.09] focus:border-purple-500/70",
+      : "border-[var(--border)] focus:border-purple-500/70",
   ].join(" ");
 }
 
-// ─── Google icon ─────────────────────────────────────────────────────────────
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
@@ -69,7 +65,6 @@ function GoogleIcon() {
   );
 }
 
-// ─── Loading spinner ──────────────────────────────────────────────────────────
 function Spinner() {
   return (
     <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -79,7 +74,6 @@ function Spinner() {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -154,68 +148,54 @@ export default function LoginPage() {
 
   return (
     <>
-      <Toaster position="top-center" theme="dark" richColors closeButton />
+      <Toaster position="top-center" richColors closeButton />
 
-      <div
-        className="min-h-screen flex flex-col"
-        style={{ background: "radial-gradient(ellipse at 50% -5%, #1e1040 0%, #0b0e18 55%)" }}
-      >
+      <div className="min-h-screen flex flex-col" style={{ background: "var(--bg-base)" }}>
         <main className="flex flex-1 items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">
 
-            {/* ── Brand (outside card) ── */}
+            {/* Brand */}
             <div className="text-center mb-8">
-              {/* <div
-                className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 shadow-lg shadow-purple-900/40"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
-                aria-hidden="true"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 11h-3v3a1 1 0 01-2 0v-3H8a1 1 0 010-2h3V8a1 1 0 012 0v3h3a1 1 0 010 2z" />
-                </svg>
-              </div> */}
-              <h1 className="text-2xl font-bold text-white tracking-tight">RediX</h1>
-              
+              <h1 className="text-2xl font-bold text-[var(--text-1)] tracking-tight">RediX</h1>
             </div>
 
-            {/* ── Card ── */}
+            {/* Card */}
             <div
-              className="rounded-2xl border border-white/[0.07] px-6 sm:px-8 py-8 shadow-2xl shadow-black/40"
-              style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}
+              className="rounded-2xl border border-[var(--border)] px-6 sm:px-8 py-8 shadow-2xl shadow-black/20"
+              style={{ background: "var(--bg-card)", backdropFilter: "blur(24px)" }}
             >
-              <h2 className="text-xl font-semibold text-white text-center mb-1">
+              <h2 className="text-xl font-semibold text-[var(--text-1)] text-center mb-1">
                 Welcome back
               </h2>
-              <p className="text-gray-500 text-sm text-center mb-6">
+              <p className="text-[var(--text-3)] text-sm text-center mb-6">
                 Enter your credentials to access the ecosystem.
               </p>
 
-              {/* ── Social buttons ── */}
+              {/* Google button */}
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
                 aria-label="Continue with Google"
-                className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-white/[0.1] text-gray-300 text-sm font-medium transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+                className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-[var(--border)] text-[var(--text-2)] text-sm font-medium transition-all duration-200 hover:bg-[var(--bg-hover)] hover:text-[var(--text-1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
               >
                 <GoogleIcon />
                 Continue with Google
               </button>
 
-              {/* ── Divider ── */}
+              {/* Divider */}
               <div className="flex items-center gap-3 my-5" aria-hidden="true">
-                <div className="flex-1 h-px bg-white/[0.07]" />
-                <span className="text-gray-600 text-xs font-medium uppercase tracking-widest">or continue with</span>
-                <div className="flex-1 h-px bg-white/[0.07]" />
+                <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                <span className="text-[var(--text-3)] text-xs font-medium uppercase tracking-widest">or continue with</span>
+                <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
               </div>
 
-              {/* ── Form ── */}
+              {/* Form */}
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
                 className="flex flex-col gap-5"
                 aria-label="Sign in form"
               >
-                {/* Email / Username */}
                 <Field id="email" label="Email or Username" error={errors.email?.message}>
                   <input
                     {...register("email")}
@@ -229,7 +209,6 @@ export default function LoginPage() {
                   />
                 </Field>
 
-                {/* Password */}
                 <Field id="password" label="Password" error={errors.password?.message}>
                   <div className="relative">
                     <input
@@ -246,7 +225,7 @@ export default function LoginPage() {
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors focus-visible:outline-none"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors focus-visible:outline-none"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -262,7 +241,7 @@ export default function LoginPage() {
                           "absolute inset-0 rounded border transition-all duration-200 flex items-center justify-center pointer-events-none",
                           rememberChecked
                             ? "bg-purple-600 border-purple-600"
-                            : "border-white/20 group-hover:border-white/40",
+                            : "border-[var(--border)] group-hover:border-purple-500/50",
                         ].join(" ")}
                       >
                         {rememberChecked && (
@@ -279,7 +258,7 @@ export default function LoginPage() {
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
                     </div>
-                    <span className="text-gray-400 text-xs select-none">Remember me</span>
+                    <span className="text-[var(--text-3)] text-xs select-none">Remember me</span>
                   </label>
 
                   <Link
@@ -310,8 +289,8 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              {/* ── Signup link ── */}
-              <p className="text-center text-gray-500 text-sm mt-6">
+              {/* Signup link */}
+              <p className="text-center text-[var(--text-3)] text-sm mt-6">
                 Don&apos;t have an account?{" "}
                 <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
                   Create Account
@@ -321,11 +300,11 @@ export default function LoginPage() {
           </div>
         </main>
 
-        {/* ── Footer ── */}
-        <footer className="text-center py-5 flex flex-wrap justify-center gap-x-5 gap-y-1 text-gray-700 text-xs">
-          <Link href="#" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
-          <Link href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
-          <Link href="#" className="hover:text-gray-400 transition-colors">Status</Link>
+        {/* Footer */}
+        <footer className="text-center py-5 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[var(--text-3)] text-xs">
+          <Link href="#" className="hover:text-[var(--text-2)] transition-colors">Terms of Service</Link>
+          <Link href="#" className="hover:text-[var(--text-2)] transition-colors">Privacy Policy</Link>
+          <Link href="#" className="hover:text-[var(--text-2)] transition-colors">Status</Link>
         </footer>
       </div>
     </>

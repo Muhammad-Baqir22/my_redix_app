@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent]       = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
@@ -27,28 +27,34 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#0b0e1a" }}>
-      <Toaster position="top-center" />
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "var(--bg-base)" }}>
+      <Toaster position="top-center" richColors />
       <div className="w-full max-w-sm">
-        <Link href="/login" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-300 text-sm mb-8 transition-colors">
+        <Link
+          href="/login"
+          className="inline-flex items-center gap-2 text-[var(--text-3)] hover:text-[var(--text-1)] text-sm mb-8 transition-colors"
+        >
           <ArrowLeft size={14} /> Back to login
         </Link>
 
-        <div className="rounded-2xl border border-white/[0.07] p-8" style={{ background: "rgba(255,255,255,0.025)" }}>
+        <div
+          className="rounded-2xl border border-[var(--border)] p-8"
+          style={{ background: "var(--bg-card)" }}
+        >
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
             style={{ background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}>
             <Mail size={20} className="text-white" />
           </div>
 
-          <h1 className="text-white font-bold text-xl mb-1">Reset your password</h1>
-          <p className="text-gray-500 text-sm mb-6">
-            Enter your email and we'll send you a reset link.
+          <h1 className="text-[var(--text-1)] font-bold text-xl mb-1">Reset your password</h1>
+          <p className="text-[var(--text-3)] text-sm mb-6">
+            Enter your email and we&apos;ll send you a reset link.
           </p>
 
           {sent ? (
             <div className="text-center py-4">
               <p className="text-green-400 font-medium text-sm mb-1">Email sent!</p>
-              <p className="text-gray-500 text-sm">Check your inbox and follow the link to reset your password.</p>
+              <p className="text-[var(--text-3)] text-sm">Check your inbox and follow the link to reset your password.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -58,7 +64,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/10 transition-all"
               />
               <button
                 type="submit"

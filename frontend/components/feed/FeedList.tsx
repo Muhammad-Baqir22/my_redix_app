@@ -10,26 +10,26 @@ import PostCard from "./PostCard";
 function PostSkeleton() {
   return (
     <div
-      className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] animate-pulse"
-      style={{ background: "rgba(255,255,255,0.025)" }}
+      className="flex gap-4 p-4 rounded-2xl border border-[var(--border)] animate-pulse"
+      style={{ background: "var(--bg-card)" }}
     >
       <div className="flex flex-col items-center gap-2 w-8 flex-shrink-0">
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
-        <div className="w-8 h-3 bg-white/[0.06] rounded" />
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
+        <div className="w-8 h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
       </div>
       <div className="flex-1 space-y-3">
         <div className="flex gap-2 items-center">
-          <div className="w-5 h-5 bg-white/[0.06] rounded-full" />
-          <div className="w-24 h-3 bg-white/[0.06] rounded" />
-          <div className="w-32 h-3 bg-white/[0.06] rounded" />
+          <div className="w-5 h-5 bg-[var(--bg-hover)] rounded-full" />
+          <div className="w-24 h-3 bg-[var(--bg-hover)] rounded" />
+          <div className="w-32 h-3 bg-[var(--bg-hover)] rounded" />
         </div>
-        <div className="w-3/4 h-5 bg-white/[0.06] rounded" />
-        <div className="w-full h-3 bg-white/[0.06] rounded"/>
-        <div className="w-2/3 h-3 bg-white/[0.06] rounded" />
+        <div className="w-3/4 h-5 bg-[var(--bg-hover)] rounded" />
+        <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-2/3 h-3 bg-[var(--bg-hover)] rounded" />
         <div className="flex gap-2 mt-1">
-          <div className="w-24 h-6 bg-white/[0.06] rounded-lg" />
-          <div className="w-16 h-6 bg-white/[0.06] rounded-lg" />
+          <div className="w-24 h-6 bg-[var(--bg-hover)] rounded-lg" />
+          <div className="w-16 h-6 bg-[var(--bg-hover)] rounded-lg" />
         </div>
       </div>
     </div>
@@ -88,12 +88,12 @@ export default function FeedList() {
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <AlertCircle size={32} className="text-red-400" />
         <div>
-          <p className="text-white font-medium mb-1">Failed to load posts</p>
-          <p className="text-gray-500 text-sm">{error}</p>
+          <p className="text-[var(--text-1)] font-medium mb-1">Failed to load posts</p>
+          <p className="text-[var(--text-3)] text-sm">{error}</p>
         </div>
         <button
           onClick={() => fetchPosts(1)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white border border-white/[0.1] hover:bg-white/[0.05] transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-1)] border border-[var(--border)] hover:bg-[var(--bg-hover)] transition-all"
         >
           <RefreshCw size={14} />
           Try again
@@ -105,8 +105,8 @@ export default function FeedList() {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
-        <p className="text-gray-400 text-lg font-medium">Your feed is empty</p>
-        <p className="text-gray-600 text-sm">Follow communities or users to see posts here.</p>
+        <p className="text-[var(--text-2)] text-lg font-medium">Your feed is empty</p>
+        <p className="text-[var(--text-3)] text-sm">Follow communities or users to see posts here.</p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function FeedList() {
         <button
           onClick={loadMore}
           disabled={loadingMore}
-          className="w-full py-3 rounded-2xl border border-white/[0.07] text-gray-400 text-sm font-medium hover:bg-white/[0.04] hover:text-white transition-all duration-200 disabled:opacity-50"
+          className="w-full py-3 rounded-2xl border border-[var(--border)] text-[var(--text-2)] text-sm font-medium hover:bg-[var(--bg-hover)] hover:text-[var(--text-1)] transition-all duration-200 disabled:opacity-50"
         >
           {loadingMore ? "Loading…" : "Load more posts"}
         </button>

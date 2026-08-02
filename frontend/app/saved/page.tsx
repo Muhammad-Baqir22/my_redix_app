@@ -11,16 +11,16 @@ import { ApiResponse, FeedPost } from "@/types/api";
 
 function PostSkeleton() {
   return (
-    <div className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] animate-pulse" style={{ background: "rgba(255,255,255,0.025)" }}>
+    <div className="flex gap-4 p-4 rounded-2xl border border-[var(--border)] animate-pulse" style={{ background: "var(--bg-card)" }}>
       <div className="flex flex-col items-center gap-2 w-8 flex-shrink-0">
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
-        <div className="w-8 h-3 bg-white/[0.06] rounded" />
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
+        <div className="w-8 h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
       </div>
       <div className="flex-1 space-y-3">
-        <div className="w-3/4 h-5 bg-white/[0.06] rounded" />
-        <div className="w-full h-3 bg-white/[0.06] rounded" />
-        <div className="w-2/3 h-3 bg-white/[0.06] rounded" />
+        <div className="w-3/4 h-5 bg-[var(--bg-hover)] rounded" />
+        <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-2/3 h-3 bg-[var(--bg-hover)] rounded" />
       </div>
     </div>
   );
@@ -41,7 +41,7 @@ export default function SavedPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
 
       <div className="flex pt-14">
@@ -54,9 +54,9 @@ export default function SavedPage() {
             <div className="flex items-center gap-2 mb-5">
               <Bookmark size={20} className="text-purple-400" />
               <div>
-                <h1 className="text-white font-bold text-xl">Saved</h1>
+                <h1 className="text-[var(--text-1)] font-bold text-xl">Saved</h1>
                 {!loading && (
-                  <p className="text-gray-500 text-xs mt-0.5">
+                  <p className="text-[var(--text-3)] text-xs mt-0.5">
                     {posts.length} saved {posts.length === 1 ? "post" : "posts"}
                   </p>
                 )}
@@ -74,16 +74,16 @@ export default function SavedPage() {
             {error && (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
                 <AlertCircle size={28} className="text-red-400" />
-                <p className="text-gray-400 text-sm">{error}</p>
+                <p className="text-[var(--text-2)] text-sm">{error}</p>
               </div>
             )}
 
             {/* Empty */}
             {!loading && !error && posts.length === 0 && (
               <div className="py-24 text-center">
-                <Bookmark size={32} className="text-gray-700 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium mb-1">Nothing saved yet</p>
-                <p className="text-gray-600 text-sm">Hit the Save button on any post to bookmark it here.</p>
+                <Bookmark size={32} className="text-[var(--text-3)] mx-auto mb-3" />
+                <p className="text-[var(--text-2)] font-medium mb-1">Nothing saved yet</p>
+                <p className="text-[var(--text-3)] text-sm">Hit the Save button on any post to bookmark it here.</p>
               </div>
             )}
 

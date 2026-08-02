@@ -19,8 +19,8 @@ export default function MobileNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 flex md:hidden border-t border-white/[0.07] pb-safe"
-      style={{ background: "rgba(11,14,26,0.97)", backdropFilter: "blur(16px)" }}
+      className="fixed bottom-0 inset-x-0 z-50 flex md:hidden border-t border-[var(--border)] pb-safe"
+      style={{ background: "var(--bg-nav)", backdropFilter: "blur(16px)" }}
     >
       {NAV.map(({ icon: Icon, href, label }) => {
         const active = pathname === href;
@@ -38,8 +38,8 @@ export default function MobileNav() {
               </div>
             ) : (
               <>
-                <Icon size={20} className={active ? "text-purple-400" : "text-gray-500"} />
-                <span className={`text-[10px] font-medium ${active ? "text-purple-400" : "text-gray-600"}`}>
+                <Icon size={20} className={active ? "text-purple-400" : "text-[var(--text-3)]"} />
+                <span className={`text-[10px] font-medium ${active ? "text-purple-400" : "text-[var(--text-3)]"}`}>
                   {label}
                 </span>
               </>

@@ -79,7 +79,7 @@ export default function CommunitiesPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: "var(--bg-base)" }}>
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
@@ -88,7 +88,7 @@ export default function CommunitiesPage() {
 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-white font-bold text-xl">Communities</h1>
+              <h1 className="text-[var(--text-1)] font-bold text-xl">Communities</h1>
               <button
                 onClick={() => setShowModal(true)}
                 className="flex items-center gap-1.5 px-3 py-2 sm:px-4 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all hover:opacity-90 flex-shrink-0"
@@ -104,7 +104,7 @@ export default function CommunitiesPage() {
             {loading && (
               <div className="flex flex-col gap-2.5">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
+                  <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: "var(--bg-hover)" }} />
                 ))}
               </div>
             )}
@@ -112,7 +112,7 @@ export default function CommunitiesPage() {
             {/* Empty state */}
             {!loading && subs.length === 0 && (
               <div className="text-center py-20">
-                <p className="text-gray-500 text-sm mb-4">No communities yet.</p>
+                <p className="text-[var(--text-3)] text-sm mb-4">No communities yet.</p>
                 <button
                   onClick={() => setShowModal(true)}
                   className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold"
@@ -128,8 +128,8 @@ export default function CommunitiesPage() {
               {subs.map((sub) => (
                 <div
                   key={sub.id}
-                  className="flex items-center gap-3 px-3 py-3 sm:p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/20 transition-all"
-                  style={{ background: "rgba(255,255,255,0.025)" }}
+                  className="flex items-center gap-3 px-3 py-3 sm:p-4 rounded-2xl border border-[var(--border)] hover:border-purple-500/20 transition-all"
+                  style={{ background: "var(--bg-card)" }}
                 >
                   {/* Icon + info (clickable) */}
                   <Link href={`/community/${sub.name}`} className="flex items-center gap-3 flex-1 min-w-0">
@@ -140,13 +140,13 @@ export default function CommunitiesPage() {
                       <Hash size={15} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-white font-semibold text-sm truncate">r/{sub.name}</p>
-                      <span className="text-gray-600 text-xs flex items-center gap-1 mt-0.5">
+                      <p className="text-[var(--text-1)] font-semibold text-sm truncate">r/{sub.name}</p>
+                      <span className="text-[var(--text-3)] text-xs flex items-center gap-1 mt-0.5">
                         <Users size={10} />
                         {sub.member_count} members
                       </span>
                       {sub.description && (
-                        <p className="text-gray-500 text-xs truncate mt-0.5">{sub.description}</p>
+                        <p className="text-[var(--text-3)] text-xs truncate mt-0.5">{sub.description}</p>
                       )}
                     </div>
                   </Link>
@@ -160,9 +160,11 @@ export default function CommunitiesPage() {
                     <button
                       onClick={() => toggleFollow(sub)}
                       className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-3 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0 ${
-                        sub.is_following ? "bg-white/[0.06] text-gray-400" : "text-white"
+                        sub.is_following ? "text-[var(--text-2)]" : "text-white"
                       }`}
-                      style={sub.is_following ? undefined : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
+                      style={sub.is_following
+                        ? { background: "var(--bg-hover)" }
+                        : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
                     >
                       {sub.is_following
                         ? <><Check size={11} /><span>Joined</span></>
@@ -185,24 +187,24 @@ export default function CommunitiesPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
           <div
-            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl border border-white/[0.1] p-5 sm:p-6"
-            style={{ background: "#141728" }}
+            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl border border-[var(--border)] p-5 sm:p-6"
+            style={{ background: "var(--bg-elevated)" }}
           >
             {/* Drag handle on mobile */}
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4 sm:hidden" />
 
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-bold text-lg">Create Community</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-300 transition-colors p-1">
+              <h2 className="text-[var(--text-1)] font-bold text-lg">Create Community</h2>
+              <button onClick={() => setShowModal(false)} className="text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors p-1">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={createCommunity} className="flex flex-col gap-4">
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Community name</label>
-                <div className="flex items-center bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 focus-within:border-purple-500/50 transition-colors">
-                  <span className="text-gray-500 text-sm mr-1">r/</span>
+                <label className="text-[var(--text-2)] text-xs font-medium mb-1.5 block">Community name</label>
+                <div className="flex items-center bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-3 py-2.5 focus-within:border-purple-500/50 transition-colors">
+                  <span className="text-[var(--text-3)] text-sm mr-1">r/</span>
                   <input
                     type="text"
                     value={form.name}
@@ -210,27 +212,27 @@ export default function CommunitiesPage() {
                     placeholder="community_name"
                     required
                     autoFocus
-                    className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-600"
+                    className="flex-1 bg-transparent text-[var(--text-1)] text-sm outline-none placeholder-[var(--text-3)]"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">
-                  Description <span className="text-gray-600">(optional)</span>
+                <label className="text-[var(--text-2)] text-xs font-medium mb-1.5 block">
+                  Description <span className="text-[var(--text-3)]">(optional)</span>
                 </label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="What is this community about?"
                   rows={3}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 resize-none outline-none focus:border-purple-500/50 transition-colors"
+                  className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-[var(--text-1)] text-sm placeholder-[var(--text-3)] resize-none outline-none focus:border-purple-500/50 transition-colors"
                 />
               </div>
               <div className="flex gap-3 justify-end mt-1">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl text-gray-400 text-sm hover:text-gray-200 transition-colors"
+                  className="px-4 py-2 rounded-xl text-[var(--text-2)] text-sm hover:text-[var(--text-1)] transition-colors"
                 >
                   Cancel
                 </button>

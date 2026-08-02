@@ -12,16 +12,16 @@ import { ApiResponse, FeedPost } from "@/types/api";
 
 function PostSkeleton() {
   return (
-    <div className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] animate-pulse" style={{ background: "rgba(255,255,255,0.025)" }}>
+    <div className="flex gap-4 p-4 rounded-2xl border border-[var(--border)] animate-pulse" style={{ background: "var(--bg-card)" }}>
       <div className="flex flex-col items-center gap-2 w-8 flex-shrink-0">
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
-        <div className="w-8 h-3 bg-white/[0.06] rounded" />
-        <div className="w-6 h-6 bg-white/[0.06] rounded-lg" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
+        <div className="w-8 h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-6 h-6 bg-[var(--bg-hover)] rounded-lg" />
       </div>
       <div className="flex-1 space-y-3">
-        <div className="w-3/4 h-5 bg-white/[0.06] rounded" />
-        <div className="w-full h-3 bg-white/[0.06] rounded" />
-        <div className="w-2/3 h-3 bg-white/[0.06] rounded" />
+        <div className="w-3/4 h-5 bg-[var(--bg-hover)] rounded" />
+        <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-2/3 h-3 bg-[var(--bg-hover)] rounded" />
       </div>
     </div>
   );
@@ -45,7 +45,7 @@ export default function PopularPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
 
       <div className="flex pt-14">
@@ -59,8 +59,8 @@ export default function PopularPage() {
             <div className="flex items-center gap-2 mb-5">
               <Flame size={20} className="text-orange-400" />
               <div>
-                <h1 className="text-white font-bold text-xl">Popular</h1>
-                <p className="text-gray-500 text-xs mt-0.5">Top posts from the last 24 hours</p>
+                <h1 className="text-[var(--text-1)] font-bold text-xl">Popular</h1>
+                <p className="text-[var(--text-3)] text-xs mt-0.5">Top posts from the last 24 hours</p>
               </div>
             </div>
 
@@ -75,7 +75,7 @@ export default function PopularPage() {
             {error && (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
                 <AlertCircle size={28} className="text-red-400" />
-                <p className="text-gray-400 text-sm">{error}</p>
+                <p className="text-[var(--text-2)] text-sm">{error}</p>
                 <button
                   onClick={() => { setError(null); setLoading(true);
                     apiFetch<ApiResponse<FeedPost[]>>("/api/post/popular?page=1&pageSize=20")
@@ -94,9 +94,9 @@ export default function PopularPage() {
             {/* Empty */}
             {!loading && !error && posts.length === 0 && (
               <div className="py-20 text-center">
-                <Flame size={32} className="text-gray-700 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium mb-1">Nothing trending yet</p>
-                <p className="text-gray-600 text-sm">No posts with votes in the last 24 hours.</p>
+                <Flame size={32} className="text-[var(--text-3)] mx-auto mb-3" />
+                <p className="text-[var(--text-2)] font-medium mb-1">Nothing trending yet</p>
+                <p className="text-[var(--text-3)] text-sm">No posts with votes in the last 24 hours.</p>
               </div>
             )}
 
@@ -108,11 +108,8 @@ export default function PopularPage() {
                     {/* Rank badge */}
                     {i < 3 && (
                       <div
-                        className="absolute -left-3 top-4 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black z-10 border-2 border-[#0b0e1a]"
-                        style={{
-                          background: i === 0 ? "#f59e0b" : i === 1 ? "#9ca3af" : "#b45309",
-                          color: "#0b0e1a",
-                        }}
+                        className="absolute -left-3 top-4 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black z-10 border-2"
+                        style={{ background: i === 0 ? "#f59e0b" : i === 1 ? "#9ca3af" : "#b45309", color: "var(--bg-base)", borderColor: "var(--bg-base)" }}
                       >
                         {i + 1}
                       </div>
@@ -128,8 +125,8 @@ export default function PopularPage() {
 
         {/* Right sidebar */}
         <div
-          className="hidden xl:flex flex-col fixed top-14 right-0 bottom-0 w-72 border-l border-white/[0.06] overflow-y-auto"
-          style={{ background: "#0d1020" }}
+          className="hidden xl:flex flex-col fixed top-14 right-0 bottom-0 w-72 border-l border-[var(--border)] overflow-y-auto"
+          style={{ background: "var(--bg-sidebar)" }}
         >
           <RightSidebar />
         </div>

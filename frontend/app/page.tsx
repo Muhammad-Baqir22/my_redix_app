@@ -6,7 +6,7 @@ import FeedList from "@/components/feed/FeedList";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
 
       <div className="flex pt-14">
@@ -20,8 +20,8 @@ export default function HomePage() {
         </main>
 
         <div
-          className="hidden lg:flex flex-col fixed top-14 right-0 bottom-0 w-72 border-l border-white/[0.06] overflow-y-auto"
-          style={{ background: "#0d1020" }}
+          className="hidden lg:flex flex-col fixed top-14 right-0 bottom-0 w-72 border-l border-[var(--border)] overflow-y-auto"
+          style={{ background: "var(--bg-sidebar)" }}
         >
           <RightSidebar />
         </div>

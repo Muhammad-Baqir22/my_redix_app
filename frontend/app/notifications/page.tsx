@@ -59,8 +59,8 @@ function NotifIcon({ type }: { type: string }) {
     );
   }
   return (
-    <div className={base} style={{ background: "rgba(255,255,255,0.06)" }}>
-      <Bell size={17} className="text-gray-400" />
+    <div className={base} style={{ background: "var(--bg-hover)" }}>
+      <Bell size={17} className="text-[var(--text-3)]" />
     </div>
   );
 }
@@ -93,7 +93,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.Read).length;
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a", color: "#fff" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
                   <Bell size={18} className="text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">Notifications</h1>
+                  <h1 className="text-xl font-bold text-[var(--text-1)]">Notifications</h1>
                   {unreadCount > 0 && (
                     <p className="text-xs text-purple-400">{unreadCount} unread</p>
                   )}
@@ -120,7 +120,7 @@ export default function NotificationsPage() {
                 <button
                   onClick={markAllRead}
                   disabled={markingRead}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/[0.07] transition-all duration-150 disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all duration-150 disabled:opacity-50"
                 >
                   <Check size={14} />
                   Mark all read
@@ -140,36 +140,36 @@ export default function NotificationsPage() {
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(255,255,255,0.04)" }}
+                  style={{ background: "var(--bg-hover)" }}
                 >
-                  <Bell size={28} className="text-gray-600" />
+                  <Bell size={28} className="text-[var(--text-3)]" />
                 </div>
-                <p className="text-gray-500 text-sm">No notifications yet</p>
+                <p className="text-[var(--text-3)] text-sm">No notifications yet</p>
               </div>
             )}
 
             {/* List */}
             {!loading && notifications.length > 0 && (
               <div
-                className="rounded-2xl border border-white/[0.08] overflow-hidden divide-y divide-white/[0.06]"
-                style={{ background: "rgba(255,255,255,0.02)" }}
+                className="rounded-2xl border border-[var(--border)] overflow-hidden divide-y divide-[var(--border)]"
+                style={{ background: "var(--bg-card)" }}
               >
                 {notifications.map((notif) => (
                   <div
                     key={notif.id}
-                    className="flex items-start gap-4 px-5 py-4 transition-colors hover:bg-white/[0.03]"
+                    className="flex items-start gap-4 px-5 py-4 transition-colors hover:bg-[var(--bg-hover)]"
                     style={!notif.Read ? { background: "rgba(124,58,237,0.05)" } : undefined}
                   >
                     <NotifIcon type={notif.type} />
                     <div className="flex-1 min-w-0">
                       <p
                         className={`text-sm leading-relaxed ${
-                          notif.Read ? "text-gray-300" : "text-white font-medium"
+                          notif.Read ? "text-[var(--text-2)]" : "text-[var(--text-1)] font-medium"
                         }`}
                       >
                         {notif.message}
                       </p>
-                      <p className="text-xs text-gray-600 mt-0.5">
+                      <p className="text-xs text-[var(--text-3)] mt-0.5">
                         {timeAgo(notif.created_at)}
                       </p>
                     </div>

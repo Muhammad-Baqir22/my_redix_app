@@ -25,11 +25,11 @@ interface SubredditResult {
 
 function SkeletonCard() {
   return (
-    <div className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] animate-pulse" style={{ background: "rgba(255,255,255,0.025)" }}>
-      <div className="w-10 h-10 rounded-full bg-white/[0.07] flex-shrink-0" />
+    <div className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)] animate-pulse" style={{ background: "var(--bg-card)" }}>
+      <div className="w-10 h-10 rounded-full bg-[var(--bg-hover)] flex-shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="w-32 h-4 bg-white/[0.07] rounded" />
-        <div className="w-48 h-3 bg-white/[0.05] rounded" />
+        <div className="w-32 h-4 bg-[var(--bg-hover)] rounded" />
+        <div className="w-48 h-3 bg-[var(--bg-hover)] rounded" />
       </div>
     </div>
   );
@@ -85,7 +85,7 @@ function SearchContent() {
   const total = users.length + subs.length;
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
 
       <div className="flex pt-14">
@@ -98,11 +98,11 @@ function SearchContent() {
             <div className="mb-5 flex items-center gap-3">
               <Search size={18} className="text-purple-400 flex-shrink-0" />
               <div>
-                <h1 className="text-white font-bold text-xl">
+                <h1 className="text-[var(--text-1)] font-bold text-xl">
                   {query ? `Results for "${query}"` : "Search"}
                 </h1>
                 {fetched && !loading && (
-                  <p className="text-gray-500 text-sm mt-0.5">
+                  <p className="text-[var(--text-3)] text-sm mt-0.5">
                     {total} {total === 1 ? "result" : "results"} found
                   </p>
                 )}
@@ -112,22 +112,22 @@ function SearchContent() {
             {/* No query */}
             {!query && (
               <div className="py-20 text-center">
-                <p className="text-gray-500 text-sm">Type a username or community name and press Enter.</p>
+                <p className="text-[var(--text-3)] text-sm">Type a username or community name and press Enter.</p>
               </div>
             )}
 
             {query && (
               <>
                 {/* Tabs */}
-                <div className="flex gap-1 mb-4 p-1 rounded-xl border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex gap-1 mb-4 p-1 rounded-xl border border-[var(--border)]" style={{ background: "var(--bg-card)" }}>
                   {(["users", "communities"] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setTab(t)}
                       className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
                         tab === t
-                          ? "text-white bg-white/[0.08]"
-                          : "text-gray-500 hover:text-gray-300"
+                          ? "text-[var(--text-1)] bg-[var(--bg-hover)]"
+                          : "text-[var(--text-3)] hover:text-[var(--text-2)]"
                       }`}
                     >
                       {t === "users"
@@ -149,7 +149,7 @@ function SearchContent() {
                 {error && (
                   <div className="flex flex-col items-center gap-3 py-16 text-center">
                     <AlertCircle size={28} className="text-red-400" />
-                    <p className="text-gray-400 text-sm">{error}</p>
+                    <p className="text-[var(--text-2)] text-sm">{error}</p>
                   </div>
                 )}
 
@@ -158,8 +158,8 @@ function SearchContent() {
                   <>
                     {users.length === 0 && fetched ? (
                       <div className="py-16 text-center">
-                        <p className="text-gray-400 font-medium mb-1">No users found</p>
-                        <p className="text-gray-600 text-sm">Try a different username.</p>
+                        <p className="text-[var(--text-2)] font-medium mb-1">No users found</p>
+                        <p className="text-[var(--text-3)] text-sm">Try a different username.</p>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
@@ -167,8 +167,8 @@ function SearchContent() {
                           <Link
                             key={user.id}
                             href={`/profile/${user.username}`}
-                            className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/30 transition-all duration-200 cursor-pointer"
-                            style={{ background: "rgba(255,255,255,0.025)" }}
+                            className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)] hover:border-purple-500/30 transition-all duration-200 cursor-pointer"
+                            style={{ background: "var(--bg-card)" }}
                           >
                             <div
                               className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
@@ -181,7 +181,7 @@ function SearchContent() {
                               }
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-white font-semibold text-sm truncate">u/{user.username}</p>
+                              <p className="text-[var(--text-1)] font-semibold text-sm truncate">u/{user.username}</p>
                             </div>
                           </Link>
                         ))}
@@ -195,16 +195,16 @@ function SearchContent() {
                   <>
                     {subs.length === 0 && fetched ? (
                       <div className="py-16 text-center">
-                        <p className="text-gray-400 font-medium mb-1">No communities found</p>
-                        <p className="text-gray-600 text-sm">Try a different name.</p>
+                        <p className="text-[var(--text-2)] font-medium mb-1">No communities found</p>
+                        <p className="text-[var(--text-3)] text-sm">Try a different name.</p>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
                         {subs.map((sub) => (
                           <div
                             key={sub.id}
-                            className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/30 transition-all duration-200"
-                            style={{ background: "rgba(255,255,255,0.025)" }}
+                            className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)] hover:border-purple-500/30 transition-all duration-200"
+                            style={{ background: "var(--bg-card)" }}
                           >
                             <div
                               className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
@@ -213,9 +213,9 @@ function SearchContent() {
                               r/
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-white font-semibold text-sm truncate">r/{sub.name}</p>
+                              <p className="text-[var(--text-1)] font-semibold text-sm truncate">r/{sub.name}</p>
                               {sub.description && (
-                                <p className="text-gray-500 text-xs truncate">{sub.description}</p>
+                                <p className="text-[var(--text-3)] text-xs truncate">{sub.description}</p>
                               )}
                             </div>
                             <button
@@ -223,7 +223,7 @@ function SearchContent() {
                               disabled={following.has(sub.id)}
                               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0 ${
                                 following.has(sub.id)
-                                  ? "bg-white/[0.06] text-gray-500 cursor-default"
+                                  ? "bg-[var(--bg-hover)] text-[var(--text-3)] cursor-default"
                                   : "text-white hover:opacity-90 active:scale-[0.97]"
                               }`}
                               style={following.has(sub.id) ? undefined : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}

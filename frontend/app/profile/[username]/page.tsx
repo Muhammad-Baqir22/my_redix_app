@@ -48,47 +48,47 @@ function PostCard({ post }: { post: FeedPost }) {
   };
 
   return (
-    <article className="border-b border-white/[0.06] px-5 py-4 hover:bg-white/[0.02] transition-colors">
+    <article className="border-b border-[var(--border)] px-5 py-4 hover:bg-[var(--bg-hover)] transition-colors">
       <Link href={`/post/${post.id}`}>
-        <h3 className="text-white font-semibold text-sm leading-snug mb-1.5 hover:text-purple-300 transition-colors">
+        <h3 className="text-[var(--text-1)] font-semibold text-sm leading-snug mb-1.5 hover:text-purple-300 transition-colors">
           {post.title}
         </h3>
       </Link>
 
       {post.content && (
-        <p className="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">{post.content}</p>
+        <p className="text-[var(--text-3)] text-xs leading-relaxed mb-3 line-clamp-2">{post.content}</p>
       )}
 
       {post.media_url && (
-        <div className="w-full rounded-xl overflow-hidden mb-3 bg-white/[0.04]">
+        <div className="w-full rounded-xl overflow-hidden mb-3 bg-[var(--bg-hover)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={post.media_url} alt="Post media" className="w-full max-h-64 object-cover" />
         </div>
       )}
 
       <div className="flex items-center justify-between">
-        <span className="text-gray-600 text-xs">{timeAgo(post.created_at ?? new Date().toISOString())}</span>
+        <span className="text-[var(--text-3)] text-xs">{timeAgo(post.created_at ?? new Date().toISOString())}</span>
         <div className="flex items-center gap-0.5">
           <div className="flex items-center gap-1 mr-2">
             <button
               onClick={() => handleVote(1)}
-              className={`p-1 rounded-lg transition-all hover:bg-white/[0.06] ${vote === 1 ? "text-orange-400" : "text-gray-600 hover:text-orange-400"}`}
+              className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === 1 ? "text-orange-400" : "text-[var(--text-3)] hover:text-orange-400"}`}
             >
               <ArrowUp size={13} strokeWidth={2.5} />
             </button>
-            <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-gray-500"}`}>
+            <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-[var(--text-3)]"}`}>
               {formatCount(total)}
             </span>
             <button
               onClick={() => handleVote(-1)}
-              className={`p-1 rounded-lg transition-all hover:bg-white/[0.06] ${vote === -1 ? "text-blue-400" : "text-gray-600 hover:text-blue-400"}`}
+              className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === -1 ? "text-blue-400" : "text-[var(--text-3)] hover:text-blue-400"}`}
             >
               <ArrowDown size={13} strokeWidth={2.5} />
             </button>
           </div>
           <Link
             href={`/post/${post.id}`}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[var(--text-3)] text-xs hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all"
           >
             <MessageSquare size={12} />
             {post.comment.length}
@@ -98,7 +98,7 @@ function PostCard({ post }: { post: FeedPost }) {
               navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
               toast.success("Link copied!");
             }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[var(--text-3)] text-xs hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all"
           >
             <Share2 size={12} />
           </button>
@@ -110,10 +110,10 @@ function PostCard({ post }: { post: FeedPost }) {
 
 function PostSkeleton() {
   return (
-    <div className="border-b border-white/[0.06] px-5 py-4 animate-pulse space-y-2">
-      <div className="w-3/4 h-4 bg-white/[0.06] rounded" />
-      <div className="w-full h-3 bg-white/[0.06] rounded" />
-      <div className="w-1/2 h-3 bg-white/[0.06] rounded" />
+    <div className="border-b border-[var(--border)] px-5 py-4 animate-pulse space-y-2">
+      <div className="w-3/4 h-4 bg-[var(--bg-hover)] rounded" />
+      <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+      <div className="w-1/2 h-3 bg-[var(--bg-hover)] rounded" />
     </div>
   );
 }
@@ -139,7 +139,6 @@ export default function UserProfilePage() {
     Promise.all([
       apiFetch<ApiResponse<UserProfile>>(`/api/users/${username}`),
       apiFetch<ApiResponse<FeedPost[]>>(`/api/post/user/${username}?page=1&pageSize=20`),
-      // fetch follow list — 404 if empty is fine, we catch it
       apiFetch<ApiResponse<FollowEntry[]>>("/api/users/userfollow").catch(() => ({ data: [] as FollowEntry[] })),
     ])
       .then(([profileRes, postsRes, followRes]) => {
@@ -193,9 +192,9 @@ export default function UserProfilePage() {
 
   return (
     <>
-      <Toaster position="top-center" theme="dark" richColors closeButton />
+      <Toaster position="top-center" richColors closeButton />
 
-      <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+      <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
         <Navbar />
 
         <div className="flex pt-14">
@@ -208,7 +207,7 @@ export default function UserProfilePage() {
               <div className="px-5 pt-4">
                 <button
                   onClick={() => router.back()}
-                  className="flex items-center gap-2 text-gray-500 hover:text-white text-sm transition-colors"
+                  className="flex items-center gap-2 text-[var(--text-3)] hover:text-[var(--text-1)] text-sm transition-colors"
                 >
                   <ArrowLeft size={15} />
                   Back
@@ -217,8 +216,8 @@ export default function UserProfilePage() {
 
               {notFound && (
                 <div className="py-24 text-center">
-                  <p className="text-white font-bold text-lg mb-1">User not found</p>
-                  <p className="text-gray-500 text-sm">This account may not exist.</p>
+                  <p className="text-[var(--text-1)] font-bold text-lg mb-1">User not found</p>
+                  <p className="text-[var(--text-3)] text-sm">This account may not exist.</p>
                 </div>
               )}
 
@@ -238,12 +237,12 @@ export default function UserProfilePage() {
                   </div>
 
                   {/* Profile header */}
-                  <div className="border-b border-white/[0.06] px-5 pb-4" style={{ background: "rgba(255,255,255,0.015)" }}>
+                  <div className="border-b border-[var(--border)] px-5 pb-4" style={{ background: "var(--bg-card)" }}>
                     {/* Avatar + follow button row */}
                     <div className="flex items-end justify-between -mt-12 mb-3">
                       <div
-                        className="w-24 h-24 rounded-full border-4 border-[#0b0e1a] overflow-hidden flex items-center justify-center text-white text-3xl font-bold flex-shrink-0"
-                        style={profile?.avatar_url ? undefined : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+                        className="w-24 h-24 rounded-full border-4 overflow-hidden flex items-center justify-center text-white text-3xl font-bold flex-shrink-0"
+                        style={{ borderColor: "var(--bg-base)", ...(profile?.avatar_url ? {} : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }) }}
                       >
                         {profile?.avatar_url
                           // eslint-disable-next-line @next/next/no-img-element
@@ -252,14 +251,13 @@ export default function UserProfilePage() {
                         }
                       </div>
 
-                      {/* Follow / Unfollow button — hidden on own profile */}
                       {!isOwnProfile && !loading && (
                         <button
                           onClick={handleFollowToggle}
                           disabled={followLoading}
                           className={`mt-14 flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
                             isFollowing
-                              ? "border-white/20 text-gray-300 hover:border-red-500/50 hover:text-red-400 hover:bg-red-500/10"
+                              ? "border-[var(--border)] text-[var(--text-2)] hover:border-red-500/50 hover:text-red-400 hover:bg-red-500/10"
                               : "text-white border-transparent hover:opacity-90"
                           } ${followLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                           style={isFollowing ? undefined : { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }}
@@ -275,26 +273,26 @@ export default function UserProfilePage() {
 
                     {/* Name */}
                     <div className="mb-3">
-                      <p className="text-white font-bold text-xl leading-tight">{username}</p>
-                      <p className="text-gray-500 text-sm">@{username}</p>
+                      <p className="text-[var(--text-1)] font-bold text-xl leading-tight">{username}</p>
+                      <p className="text-[var(--text-3)] text-sm">@{username}</p>
                     </div>
 
                     {/* Stats */}
                     <div className="flex items-center gap-5">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-white text-sm font-bold">{posts.length}</span>
-                        <span className="text-gray-500 text-sm">posts</span>
+                        <span className="text-[var(--text-1)] text-sm font-bold">{posts.length}</span>
+                        <span className="text-[var(--text-3)] text-sm">posts</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-white text-sm font-bold">{profile?.followers_count ?? 0}</span>
-                        <span className="text-gray-500 text-sm">followers</span>
+                        <span className="text-[var(--text-1)] text-sm font-bold">{profile?.followers_count ?? 0}</span>
+                        <span className="text-[var(--text-3)] text-sm">followers</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-white text-sm font-bold">{profile?.following_count ?? 0}</span>
-                        <span className="text-gray-500 text-sm">following</span>
+                        <span className="text-[var(--text-1)] text-sm font-bold">{profile?.following_count ?? 0}</span>
+                        <span className="text-[var(--text-3)] text-sm">following</span>
                       </div>
                       {profile?.created_at && (
-                        <p className="text-gray-600 text-xs ml-auto">
+                        <p className="text-[var(--text-3)] text-xs ml-auto">
                           Joined {new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                         </p>
                       )}
@@ -302,12 +300,12 @@ export default function UserProfilePage() {
                   </div>
 
                   {/* Posts */}
-                  <div style={{ background: "rgba(255,255,255,0.015)" }}>
+                  <div style={{ background: "var(--bg-card)" }}>
                     {loading && Array.from({ length: 4 }).map((_, i) => <PostSkeleton key={i} />)}
 
                     {!loading && posts.length === 0 && (
                       <div className="py-16 text-center">
-                        <p className="text-gray-500 text-sm">No posts yet.</p>
+                        <p className="text-[var(--text-3)] text-sm">No posts yet.</p>
                       </div>
                     )}
 

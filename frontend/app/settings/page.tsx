@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const user = getCurrentUser();
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
 
       <div className="flex pt-14">
@@ -37,18 +37,18 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3 mb-6">
               <Link
                 href="/profile"
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all"
               >
                 <ArrowLeft size={16} />
               </Link>
-              <h1 className="text-white font-bold text-xl">Settings</h1>
+              <h1 className="text-[var(--text-1)] font-bold text-xl">Settings</h1>
             </div>
 
             {/* Account info */}
             {user && (
               <div
-                className="flex items-center gap-3 p-4 rounded-2xl border border-white/[0.07] mb-5"
-                style={{ background: "rgba(255,255,255,0.025)" }}
+                className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)] mb-5"
+                style={{ background: "var(--bg-card)" }}
               >
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
@@ -57,39 +57,39 @@ export default function SettingsPage() {
                   {(user.username || user.email)[0].toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-white font-semibold text-sm truncate">{user.username || "—"}</p>
-                  <p className="text-gray-500 text-xs truncate">{user.email}</p>
+                  <p className="text-[var(--text-1)] font-semibold text-sm truncate">{user.username || "—"}</p>
+                  <p className="text-[var(--text-3)] text-xs truncate">{user.email}</p>
                 </div>
               </div>
             )}
 
             {/* Settings options */}
-            <div className="rounded-2xl border border-white/[0.07] overflow-hidden" style={{ background: "rgba(255,255,255,0.025)" }}>
+            <div className="rounded-2xl border border-[var(--border)] overflow-hidden" style={{ background: "var(--bg-card)" }}>
 
               <Link
                 href="/profile/edit"
-                className="flex items-center gap-3 px-4 py-4 hover:bg-white/[0.04] transition-colors border-b border-white/[0.06]"
+                className="flex items-center gap-3 px-4 py-4 hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border)]"
               >
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(124,58,237,0.15)" }}>
                   <UserPen size={15} className="text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-white text-sm font-medium">Edit Profile</p>
-                  <p className="text-gray-600 text-xs">Update avatar, banner, and info</p>
+                  <p className="text-[var(--text-1)] text-sm font-medium">Edit Profile</p>
+                  <p className="text-[var(--text-3)] text-xs">Update avatar, banner, and info</p>
                 </div>
-                <ChevronRight size={15} className="text-gray-600" />
+                <ChevronRight size={15} className="text-[var(--text-3)]" />
               </Link>
 
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-white/[0.04] transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-[var(--bg-hover)] transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(239,68,68,0.12)" }}>
                   <LogOut size={15} className="text-red-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-red-400 text-sm font-medium">Log out</p>
-                  <p className="text-gray-600 text-xs">Sign out of your account</p>
+                  <p className="text-[var(--text-3)] text-xs">Sign out of your account</p>
                 </div>
               </button>
 

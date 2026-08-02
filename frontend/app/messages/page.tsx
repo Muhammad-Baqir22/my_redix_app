@@ -78,36 +78,25 @@ function groupByDay(messages: Message[]) {
 export default function MessagesPage() {
   const router = useRouter();
 
-  /* myId must be state so the MQTT effect re-runs once localStorage is available */
   const [myId, setMyId] = useState<string>("");
   useEffect(() => { setMyId(getCurrentUserId() ?? ""); }, []);
 
-  /* conversations */
   const [conversations,  setConversations]  = useState<Conversation[]>([]);
   const [loadingConvs,   setLoadingConvs]   = useState(true);
-
-  /* people I follow / follow me */
   const [knownUsers,     setKnownUsers]     = useState<ChatUser[]>([]);
-
-  /* search */
   const [search,         setSearch]         = useState("");
   const [searchResults,  setSearchResults]  = useState<ChatUser[]>([]);
   const [showDrop,       setShowDrop]       = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
 
-  /* active chat */
   const [activePartner,  setActivePartner]  = useState<ChatUser | null>(null);
   const [messages,       setMessages]       = useState<Message[]>([]);
   const [loadingMsgs,    setLoadingMsgs]    = useState(false);
-
-  /* input */
   const [input,          setInput]          = useState("");
   const [sending,        setSending]        = useState(false);
   const [msgMenu,        setMsgMenu]        = useState<string | null>(null);
   const [chatMenuOpen,   setChatMenuOpen]   = useState(false);
   const chatMenuRef = useRef<HTMLDivElement>(null);
-
-  /* mobile */
   const [showMobileChat, setShowMobileChat] = useState(false);
 
   const bottomRef        = useRef<HTMLDivElement>(null);
@@ -115,12 +104,10 @@ export default function MessagesPage() {
   const activePartnerRef = useRef<ChatUser | null>(null);
   const pollRef          = useRef<NodeJS.Timeout | null>(null);
 
-  /* ── Auth guard ── */
   useEffect(() => {
     if (!getToken()) router.push("/login");
   }, [router]);
 
-  /* ── Load conversations ── */
   const loadConversations = useCallback(async () => {
     try {
       const res = await apiFetch<ApiResponse<Conversation[]>>("/api/chat/conversations");
@@ -131,7 +118,6 @@ export default function MessagesPage() {
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
-  /* ── Load followers + following → knownUsers ── */
   useEffect(() => {
     Promise.all([
       apiFetch<ApiResponse<any[]>>("/api/users/followers").catch(() => ({ data: [] })),
@@ -150,7 +136,6 @@ export default function MessagesPage() {
     });
   }, []);
 
-  /* ── Close dropdowns on outside click ── */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) setShowDrop(false);
@@ -160,7 +145,6 @@ export default function MessagesPage() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  /* ── Handle search input ── */
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearch(val);
@@ -172,7 +156,6 @@ export default function MessagesPage() {
 
   const clearSearch = () => { setSearch(""); setSearchResults([]); setShowDrop(false); };
 
-  /* ── Load messages from DB ── */
   const loadMessages = useCallback(async (partnerId: string) => {
     try {
       const res = await apiFetch<ApiResponse<Message[]>>(`/api/chat/history/dm/${partnerId}`);
@@ -181,10 +164,8 @@ export default function MessagesPage() {
     finally { setLoadingMsgs(false); }
   }, []);
 
-  /* ── Keep ref in sync so MQTT handler can read current partner without stale closure ── */
   useEffect(() => { activePartnerRef.current = activePartner; }, [activePartner]);
 
-  /* ── MQTT real-time (dynamic import avoids SSR issues with the mqtt package) ── */
   useEffect(() => {
     if (!myId) return;
     const token = getToken();
@@ -220,7 +201,6 @@ export default function MessagesPage() {
     return () => { mqttClient?.end(); };
   }, [myId]);
 
-  /* ── 5-second poll fallback (covers cases where MQTT ACL blocks delivery) ── */
   useEffect(() => {
     if (pollRef.current) clearInterval(pollRef.current);
     if (!activePartner) return;
@@ -228,12 +208,10 @@ export default function MessagesPage() {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [activePartner, loadMessages]);
 
-  /* ── Scroll to bottom ── */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* ── Open conversation ── */
   const openConversation = (partner: ChatUser) => {
     setActivePartner(partner);
     setMessages([]);
@@ -252,7 +230,6 @@ export default function MessagesPage() {
     });
   };
 
-  /* ── Send message ── */
   const sendMessage = async () => {
     if (!input.trim() || !activePartner || sending) return;
     const content = input.trim();
@@ -271,10 +248,8 @@ export default function MessagesPage() {
         method: "POST",
         body: JSON.stringify({ receiver_id: activePartner.id, content }),
       });
-      // Reload from DB — replaces the optimistic entry with the confirmed message
       await loadMessages(activePartner.id);
     } catch {
-      // Even on HTTP failure the message may be in DB — reload to check
       await loadMessages(activePartner.id);
     } finally {
       setSending(false);
@@ -295,9 +270,7 @@ export default function MessagesPage() {
       setConversations((prev) => prev.filter((c) => c.partner.id !== activePartner.id));
       setActivePartner(null);
       setShowMobileChat(false);
-    } catch {
-      // silently ignore
-    }
+    } catch { /* silently ignore */ }
   };
 
   const deleteMessage = async (msgId: string) => {
@@ -305,16 +278,13 @@ export default function MessagesPage() {
     try {
       await apiFetch<ApiResponse<unknown>>(`/api/chat/message/${msgId}`, { method: "DELETE" });
       setMessages((prev) => prev.filter((m) => m.id !== msgId));
-    } catch {
-      // silently ignore
-    }
+    } catch { /* silently ignore */ }
   };
 
   const messageGroups = groupByDay(messages);
 
-  /* ─── Render ─── */
   return (
-    <div className="h-screen overflow-hidden" style={{ background: "#0b0e1a" }}>
+    <div className="h-screen overflow-hidden" style={{ background: "var(--bg-base)" }}>
       <Navbar />
       <LeftSidebar />
 
@@ -324,35 +294,28 @@ export default function MessagesPage() {
       >
         {/* ══ LEFT PANEL ══ */}
         <div
-          className={`w-full md:w-72 flex-shrink-0 flex flex-col border-r border-white/[0.06] ${showMobileChat ? "hidden md:flex" : "flex"}`}
-          style={{ background: "#0d1020" }}
+          className={`w-full md:w-72 flex-shrink-0 flex flex-col border-r border-[var(--border)] ${showMobileChat ? "hidden md:flex" : "flex"}`}
+          style={{ background: "var(--bg-sidebar)" }}
         >
           {/* Header */}
-          <div className="px-4 pt-4 pb-3 border-b border-white/[0.06]">
+          <div className="px-4 pt-4 pb-3 border-b border-[var(--border)]">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-white font-bold text-base">Messages</h2>
-              {/* <button
-                onClick={() => { clearSearch(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all"
-                title="New message"
-              >
-                <Edit3 size={15} />
-              </button> */}
+              <h2 className="text-[var(--text-1)] font-bold text-base">Messages</h2>
             </div>
 
             {/* Live search input */}
             <div ref={searchWrapRef} className="relative">
-              <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.06] rounded-xl px-3 py-2 focus-within:border-purple-500/50 transition-colors">
-                <Search size={14} className="text-gray-500 flex-shrink-0" />
+              <div className="flex items-center gap-2 bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-3 py-2 focus-within:border-purple-500/50 transition-colors">
+                <Search size={14} className="text-[var(--text-3)] flex-shrink-0" />
                 <input
                   value={search}
                   onChange={handleSearchChange}
                   onFocus={() => { if (search.trim()) setShowDrop(true); }}
                   placeholder="Search followers & following..."
-                  className="flex-1 bg-transparent text-white text-sm placeholder-gray-600 outline-none"
+                  className="flex-1 bg-transparent text-[var(--text-1)] text-sm placeholder-[var(--text-3)] outline-none"
                 />
                 {search && (
-                  <button onClick={clearSearch} className="text-gray-600 hover:text-gray-300 transition-colors">
+                  <button onClick={clearSearch} className="text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors">
                     <X size={13} />
                   </button>
                 )}
@@ -361,21 +324,21 @@ export default function MessagesPage() {
               {/* ── Search dropdown ── */}
               {showDrop && (
                 <div
-                  className="absolute top-full left-0 right-0 mt-1.5 rounded-2xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-40"
-                  style={{ background: "#0b0e1a" }}
+                  className="absolute top-full left-0 right-0 mt-1.5 rounded-2xl border border-[var(--border)] overflow-hidden shadow-xl shadow-black/50 z-40"
+                  style={{ background: "var(--bg-base)" }}
                 >
                   {searchResults.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-6 px-4 text-center">
-                      <Users size={20} className="text-gray-700" />
-                      <p className="text-gray-500 text-xs">
+                      <Users size={20} className="text-[var(--text-3)]" />
+                      <p className="text-[var(--text-3)] text-xs">
                         No matches in your followers or following
                       </p>
                     </div>
                   ) : (
                     <>
                       <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1">
-                        <Users size={11} className="text-gray-600" />
-                        <span className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider">
+                        <Users size={11} className="text-[var(--text-3)]" />
+                        <span className="text-[var(--text-3)] text-[10px] font-semibold uppercase tracking-wider">
                           People you know
                         </span>
                       </div>
@@ -383,15 +346,15 @@ export default function MessagesPage() {
                         <button
                           key={user.id}
                           onClick={() => openConversation(user)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.05] transition-colors"
+                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--bg-hover)] transition-colors"
                         >
                           <Avatar user={user} size={8} />
                           <div className="text-left min-w-0">
-                            <p className="text-white text-sm font-medium truncate">
+                            <p className="text-[var(--text-1)] text-sm font-medium truncate">
                               u/{user.username}
                             </p>
                           </div>
-                          <span className="ml-auto text-gray-600 text-xs flex-shrink-0">Message</span>
+                          <span className="ml-auto text-[var(--text-3)] text-xs flex-shrink-0">Message</span>
                         </button>
                       ))}
                     </>
@@ -401,16 +364,16 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Conversation list (shown when not searching) */}
+          {/* Conversation list */}
           <div className="flex-1 overflow-y-auto">
             {loadingConvs && (
               <div className="flex flex-col">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3 px-4 py-3 animate-pulse">
-                    <div className="w-10 h-10 rounded-full bg-white/[0.07] flex-shrink-0" />
+                    <div className="w-10 h-10 rounded-full bg-[var(--bg-hover)] flex-shrink-0" />
                     <div className="flex-1 space-y-1.5">
-                      <div className="w-24 h-3 bg-white/[0.07] rounded" />
-                      <div className="w-36 h-2.5 bg-white/[0.05] rounded" />
+                      <div className="w-24 h-3 bg-[var(--bg-hover)] rounded" />
+                      <div className="w-36 h-2.5 bg-[var(--bg-hover)] rounded" />
                     </div>
                   </div>
                 ))}
@@ -419,9 +382,9 @@ export default function MessagesPage() {
 
             {!loadingConvs && conversations.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 gap-3 px-4 text-center">
-                <MessageSquare size={28} className="text-gray-700" />
-                <p className="text-gray-500 text-sm">No conversations yet</p>
-                <p className="text-gray-600 text-xs">Search for someone above to start chatting</p>
+                <MessageSquare size={28} className="text-[var(--text-3)]" />
+                <p className="text-[var(--text-3)] text-sm">No conversations yet</p>
+                <p className="text-[var(--text-3)] text-xs">Search for someone above to start chatting</p>
               </div>
             )}
 
@@ -432,19 +395,19 @@ export default function MessagesPage() {
                 <button
                   key={conv.partner.id}
                   onClick={() => openConversation(conv.partner)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/[0.03] transition-all ${
-                    isActive ? "bg-purple-600/10 border-l-2 border-l-purple-500" : "hover:bg-white/[0.04]"
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-[var(--border)] transition-all ${
+                    isActive ? "bg-purple-600/10 border-l-2 border-l-purple-500" : "hover:bg-[var(--bg-hover)]"
                   }`}
                 >
                   <Avatar user={conv.partner} size={10} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
-                      <p className="text-white text-sm font-semibold truncate">{conv.partner.username}</p>
-                      <span className="text-gray-600 text-xs flex-shrink-0 ml-1">
+                      <p className="text-[var(--text-1)] text-sm font-semibold truncate">{conv.partner.username}</p>
+                      <span className="text-[var(--text-3)] text-xs flex-shrink-0 ml-1">
                         {formatTime(conv.lastMessage.createdAt)}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-xs truncate">
+                    <p className="text-[var(--text-3)] text-xs truncate">
                       {isMine ? "You: " : ""}{conv.lastMessage.content}
                     </p>
                   </div>
@@ -457,7 +420,7 @@ export default function MessagesPage() {
         {/* ══ RIGHT PANEL ══ */}
         <div
           className={`flex-1 flex flex-col overflow-hidden ${!showMobileChat ? "hidden md:flex" : "flex"}`}
-          style={{ background: "#0b0e1a" }}
+          style={{ background: "var(--bg-base)" }}
         >
           {!activePartner ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -465,50 +428,50 @@ export default function MessagesPage() {
                 <MessageSquare size={28} className="text-purple-400" />
               </div>
               <div className="text-center">
-                <p className="text-white font-bold text-lg mb-1">Your Messages</p>
-                <p className="text-gray-500 text-sm">Search for a follower or following to start chatting</p>
+                <p className="text-[var(--text-1)] font-bold text-lg mb-1">Your Messages</p>
+                <p className="text-[var(--text-3)] text-sm">Search for a follower or following to start chatting</p>
               </div>
             </div>
           ) : (
             <>
               {/* Chat header */}
               <div
-                className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] flex-shrink-0"
-                style={{ background: "#0d1020" }}
+                className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] flex-shrink-0"
+                style={{ background: "var(--bg-sidebar)" }}
               >
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setShowMobileChat(false)}
-                    className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white transition-colors"
+                    className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors"
                   >
                     ←
                   </button>
                   <div className="relative">
                     <Avatar user={activePartner} size={9} />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#0d1020]" />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2" style={{ borderColor: "var(--bg-sidebar)" }} />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-bold leading-none">{activePartner.username}</p>
+                    <p className="text-[var(--text-1)] text-sm font-bold leading-none">{activePartner.username}</p>
                     <p className="text-green-400 text-[10px] font-semibold mt-0.5 uppercase tracking-wide">Connected</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   {[Search, Phone, Video].map((Icon, i) => (
-                    <button key={i} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all">
+                    <button key={i} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all">
                       <Icon size={15} />
                     </button>
                   ))}
                   <div ref={chatMenuRef} className="relative">
                     <button
                       onClick={() => setChatMenuOpen((v) => !v)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all"
                     >
                       <MoreVertical size={15} />
                     </button>
                     {chatMenuOpen && (
                       <div
-                        className="absolute right-0 top-full mt-1 w-44 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-30"
-                        style={{ background: "#141728" }}
+                        className="absolute right-0 top-full mt-1 w-44 rounded-xl border border-[var(--border)] overflow-hidden shadow-xl shadow-black/50 z-30"
+                        style={{ background: "var(--bg-elevated)" }}
                       >
                         <button
                           onClick={deleteConversation}
@@ -534,17 +497,17 @@ export default function MessagesPage() {
                 {!loadingMsgs && messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full gap-2 py-12">
                     <Avatar user={activePartner} size={14} />
-                    <p className="text-white font-semibold mt-2">u/{activePartner.username}</p>
-                    <p className="text-gray-500 text-sm">Send a message to start the conversation</p>
+                    <p className="text-[var(--text-1)] font-semibold mt-2">u/{activePartner.username}</p>
+                    <p className="text-[var(--text-3)] text-sm">Send a message to start the conversation</p>
                   </div>
                 )}
 
                 {!loadingMsgs && messageGroups.map((group) => (
                   <div key={group.label}>
                     <div className="flex items-center gap-3 my-4">
-                      <div className="flex-1 h-px bg-white/[0.06]" />
-                      <span className="text-gray-600 text-xs font-medium uppercase tracking-wider">{group.label}</span>
-                      <div className="flex-1 h-px bg-white/[0.06]" />
+                      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                      <span className="text-[var(--text-3)] text-xs font-medium uppercase tracking-wider">{group.label}</span>
+                      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
                     </div>
 
                     {group.messages.map((msg, idx) => {
@@ -568,26 +531,25 @@ export default function MessagesPage() {
                             )}
                             <div className={`flex items-end gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                               <div
-                                className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isMe ? "rounded-br-sm text-white" : "rounded-bl-sm text-gray-200"}`}
+                                className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isMe ? "rounded-br-sm text-white" : "rounded-bl-sm text-[var(--text-1)]"}`}
                                 style={isMe
                                   ? { background: "linear-gradient(135deg, #7c3aed, #6366f1)" }
-                                  : { background: "rgba(255,255,255,0.06)" }}
+                                  : { background: "var(--bg-hover)" }}
                               >
                                 {msg.content}
                               </div>
-                              {/* 3-dot delete — own messages only */}
                               {isMe && !msg.id.startsWith("tmp-") && (
                                 <div className="relative flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
                                     onClick={() => setMsgMenu(msgMenu === msg.id ? null : msg.id)}
-                                    className="w-6 h-6 flex items-center justify-center rounded-full text-gray-600 hover:text-gray-300 hover:bg-white/[0.08] transition-all"
+                                    className="w-6 h-6 flex items-center justify-center rounded-full text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-[var(--bg-hover)] transition-all"
                                   >
                                     <MoreVertical size={13} />
                                   </button>
                                   {msgMenu === msg.id && (
                                     <div
-                                      className="absolute right-0 bottom-full mb-1 w-32 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-30"
-                                      style={{ background: "#141728" }}
+                                      className="absolute right-0 bottom-full mb-1 w-32 rounded-xl border border-[var(--border)] overflow-hidden shadow-xl shadow-black/50 z-30"
+                                      style={{ background: "var(--bg-elevated)" }}
                                     >
                                       <button
                                         onClick={() => deleteMessage(msg.id)}
@@ -601,7 +563,7 @@ export default function MessagesPage() {
                                 </div>
                               )}
                             </div>
-                            <p className="text-gray-700 text-[10px] mt-0.5 mx-1">
+                            <p className="text-[var(--text-3)] text-[10px] mt-0.5 mx-1">
                               {formatTime(msg.createdAt)}
                               {isMe && <span className="ml-1 text-purple-400">✓✓</span>}
                             </p>
@@ -615,14 +577,14 @@ export default function MessagesPage() {
               </div>
 
               {/* Input bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-t border-white/[0.06]" style={{ background: "#0d1020" }}>
+              <div className="flex-shrink-0 px-4 py-3 border-t border-[var(--border)]" style={{ background: "var(--bg-sidebar)" }}>
                 <div
-                  className="flex items-end gap-2 rounded-2xl border border-white/[0.08] px-3 py-2"
-                  style={{ background: "rgba(255,255,255,0.04)" }}
+                  className="flex items-end gap-2 rounded-2xl border border-[var(--border)] px-3 py-2"
+                  style={{ background: "var(--bg-input)" }}
                 >
                   <div className="flex items-center gap-1 pb-0.5">
                     {[Plus, ImageIcon, Paperclip].map((Icon, i) => (
-                      <button key={i} className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:text-purple-400 transition-colors">
+                      <button key={i} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-purple-400 transition-colors">
                         <Icon size={i === 0 ? 16 : 15} />
                       </button>
                     ))}
@@ -634,19 +596,19 @@ export default function MessagesPage() {
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
                     rows={1}
-                    className="flex-1 bg-transparent text-white text-sm placeholder-gray-600 outline-none resize-none max-h-32 leading-relaxed py-1"
+                    className="flex-1 bg-transparent text-[var(--text-1)] text-sm placeholder-[var(--text-3)] outline-none resize-none max-h-32 leading-relaxed py-1"
                     style={{ scrollbarWidth: "none" }}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || sending}
-                    className={`w-8 h-8 flex items-center justify-center rounded-xl flex-shrink-0 mb-0.5 transition-all ${input.trim() ? "text-white hover:opacity-90 active:scale-95" : "text-gray-700 cursor-not-allowed"}`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-xl flex-shrink-0 mb-0.5 transition-all ${input.trim() ? "text-white hover:opacity-90 active:scale-95" : "text-[var(--text-3)] cursor-not-allowed"}`}
                     style={input.trim() ? { background: "linear-gradient(135deg, #7c3aed, #6366f1)" } : undefined}
                   >
                     <Send size={14} className={sending ? "opacity-50" : ""} />
                   </button>
                 </div>
-                <p className="text-gray-700 text-[10px] text-center mt-1.5">
+                <p className="text-[var(--text-3)] text-[10px] text-center mt-1.5">
                   Press Enter to send · Shift+Enter for new line
                 </p>
               </div>

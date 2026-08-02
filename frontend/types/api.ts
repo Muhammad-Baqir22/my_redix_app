@@ -53,6 +53,8 @@ export interface ApiSubreddit {
   name: string;
   description: string | null;
   created_by: string;
+  is_following?: boolean;
+  member_count?: number;
 }
 
 /** Entry from GET /api/subreddit/followsub */

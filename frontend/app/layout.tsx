@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MobileNav from "@/components/layout/MobileNav";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -27,12 +28,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
+      <head>
+        {/* Apply saved theme before first paint to prevent flash */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem("theme")||"dark";document.documentElement.classList.toggle("dark",t==="dark");}catch(e){}})();` }} />
+      </head>
       <body className="min-h-full flex flex-col pb-16 md:pb-0">
-        {children}
-        <MobileNav />
-        <Toaster position="top-center" theme="dark" richColors closeButton />
+        <ThemeProvider>
+          {children}
+          <MobileNav />
+          <Toaster position="top-center" theme="dark" richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

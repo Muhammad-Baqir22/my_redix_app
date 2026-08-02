@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Bell, Mail, Plus, Users, Hash, X } from "lucide-react";
+import { Search, Bell, Mail, Plus, Users, Hash, X, Sun, Moon } from "lucide-react";
 import { getCurrentUser, getProfileImages, apiFetch } from "@/lib/api";
 import { ApiResponse } from "@/types/api";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 interface UserResult   { id: string; username: string; avatar_url?: string | null; }
 interface SubResult    { id: string; name: string; description?: string | null; }
@@ -20,6 +21,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const router   = useRouter();
+  const { theme, toggle } = useTheme();
 
   const [query,       setQuery]       = useState("");
   const [results,     setResults]     = useState<SearchResult>({ users: [], subs: [] });
@@ -113,12 +115,12 @@ export default function Navbar() {
 
   return (
     <header
-      className="fixed top-0 inset-x-0 z-50 h-14 flex items-center px-4 gap-4 border-b border-white/[0.07]"
-      style={{ background: "rgba(11, 14, 26, 0.97)", backdropFilter: "blur(16px)" }}
+      className="fixed top-0 inset-x-0 z-50 h-14 flex items-center px-4 gap-4 border-b border-[var(--border)]"
+      style={{ background: "var(--bg-nav)", backdropFilter: "blur(16px)" }}
     >
       {/* Logo */}
       <Link href="/" className="flex items-center flex-shrink-0 mr-2">
-        <span className="text-white font-bold text-lg tracking-tight">RediX</span>
+        <span className="text-[var(--text-1)] font-bold text-lg tracking-tight">RediX</span>
       </Link>
 
       {/* Search with live dropdown */}
@@ -127,7 +129,7 @@ export default function Navbar() {
           <div className="relative">
             <Search
               size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] pointer-events-none"
             />
             <input
               type="text"
@@ -135,13 +137,13 @@ export default function Navbar() {
               onChange={handleChange}
               onFocus={() => { if (query.trim() && total > 0) setOpen(true); }}
               placeholder="Search users & communities…"
-              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl pl-8 pr-8 py-2 text-sm text-white placeholder-gray-600 outline-none transition-all duration-200 hover:border-white/15 focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/10"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-xl pl-8 pr-8 py-2 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none transition-all duration-200 focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/10"
             />
             {query && (
               <button
                 type="button"
                 onClick={clearSearch}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-300 transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors"
               >
                 <X size={13} />
               </button>
@@ -152,8 +154,8 @@ export default function Navbar() {
         {/* Dropdown */}
         {open && query.trim() && (
           <div
-            className="absolute top-full left-0 right-0 mt-1.5 rounded-2xl border border-white/[0.1] overflow-hidden shadow-2xl shadow-black/60 z-50"
-            style={{ background: "#0d1020" }}
+            className="absolute top-full left-0 right-0 mt-1.5 rounded-2xl border border-[var(--border)] overflow-hidden shadow-2xl shadow-black/60 z-50"
+            style={{ background: "var(--bg-sidebar)" }}
           >
             {loading && (
               <div className="flex items-center justify-center py-5">
@@ -163,22 +165,22 @@ export default function Navbar() {
 
             {!loading && total === 0 && (
               <div className="px-4 py-5 text-center">
-                <p className="text-gray-500 text-sm">No results for &quot;{query}&quot;</p>
+                <p className="text-[var(--text-3)] text-sm">No results for &quot;{query}&quot;</p>
               </div>
             )}
 
             {!loading && results.users.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 px-4 pt-3 pb-1.5">
-                  <Users size={12} className="text-gray-600" />
-                  <span className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider">Users</span>
+                  <Users size={12} className="text-[var(--text-3)]" />
+                  <span className="text-[var(--text-3)] text-[10px] font-semibold uppercase tracking-wider">Users</span>
                 </div>
                 {results.users.map((user) => (
                   <Link
                     key={user.id}
                     href={`/profile/${user.username}`}
                     onClick={() => { setOpen(false); setQuery(""); }}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.05] transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--bg-hover)] transition-colors"
                   >
                     <div
                       className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
@@ -190,7 +192,7 @@ export default function Navbar() {
                         : user.username[0].toUpperCase()
                       }
                     </div>
-                    <span className="text-white text-sm">u/{user.username}</span>
+                    <span className="text-[var(--text-1)] text-sm">u/{user.username}</span>
                   </Link>
                 ))}
               </div>
@@ -198,14 +200,14 @@ export default function Navbar() {
 
             {!loading && results.subs.length > 0 && (
               <div>
-                <div className={`flex items-center gap-2 px-4 pb-1.5 ${results.users.length > 0 ? "pt-2 border-t border-white/[0.06] mt-1" : "pt-3"}`}>
-                  <Hash size={12} className="text-gray-600" />
-                  <span className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider">Communities</span>
+                <div className={`flex items-center gap-2 px-4 pb-1.5 ${results.users.length > 0 ? "pt-2 border-t border-[var(--border)] mt-1" : "pt-3"}`}>
+                  <Hash size={12} className="text-[var(--text-3)]" />
+                  <span className="text-[var(--text-3)] text-[10px] font-semibold uppercase tracking-wider">Communities</span>
                 </div>
                 {results.subs.map((sub) => (
                   <div
                     key={sub.id}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.05] transition-colors cursor-pointer"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
                     onClick={() => { setOpen(false); setQuery(""); }}
                   >
                     <div
@@ -215,9 +217,9 @@ export default function Navbar() {
                       r/
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white text-sm truncate">r/{sub.name}</p>
+                      <p className="text-[var(--text-1)] text-sm truncate">r/{sub.name}</p>
                       {sub.description && (
-                        <p className="text-gray-600 text-xs truncate">{sub.description}</p>
+                        <p className="text-[var(--text-3)] text-xs truncate">{sub.description}</p>
                       )}
                     </div>
                   </div>
@@ -225,12 +227,11 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* See all results */}
             {!loading && total > 0 && (
               <Link
                 href={`/search?q=${encodeURIComponent(query.trim())}`}
                 onClick={() => { setOpen(false); }}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-purple-400 text-xs font-semibold hover:bg-white/[0.04] transition-colors border-t border-white/[0.06] mt-1"
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-purple-400 text-xs font-semibold hover:bg-[var(--bg-hover)] transition-colors border-t border-[var(--border)] mt-1"
               >
                 <Search size={12} />
                 See all results for &quot;{query}&quot;
@@ -248,8 +249,8 @@ export default function Navbar() {
             href={link.href}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
               pathname === link.href
-                ? "text-white bg-white/[0.08]"
-                : "text-gray-400 hover:text-white hover:bg-white/[0.05]"
+                ? "text-[var(--text-1)] bg-[var(--bg-hover)]"
+                : "text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)]"
             }`}
           >
             {link.label}
@@ -259,10 +260,19 @@ export default function Navbar() {
 
       {/* Right actions */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* Theme toggle */}
+        <button
+          onClick={toggle}
+          aria-label="Toggle theme"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all duration-150"
+        >
+          {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+        </button>
+
         <Link
           href="/notifications"
           aria-label="Notifications"
-          className="relative w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all duration-150"
+          className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all duration-150"
         >
           <Bell size={17} />
           {unreadCount > 0 && (
@@ -275,7 +285,7 @@ export default function Navbar() {
         <Link
           href="/messages"
           aria-label="Messages"
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.07] transition-all duration-150"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all duration-150"
         >
           <Mail size={17} />
         </Link>

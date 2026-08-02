@@ -51,24 +51,22 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
   if (deleted) return null;
 
   return (
-    <article
-      className="border-b border-white/[0.06] px-5 py-4 hover:bg-white/[0.02] transition-colors"
-    >
+    <article className="border-b border-[var(--border)] px-5 py-4 hover:bg-[var(--bg-hover)] transition-colors">
       {/* Title */}
       <Link href={`/post/${post.id}`}>
-        <h3 className="text-white font-semibold text-sm leading-snug mb-1.5 hover:text-purple-300 transition-colors">
+        <h3 className="text-[var(--text-1)] font-semibold text-sm leading-snug mb-1.5 hover:text-purple-300 transition-colors">
           {post.title}
         </h3>
       </Link>
 
       {/* Body preview */}
       {post.content && (
-        <p className="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">{post.content}</p>
+        <p className="text-[var(--text-3)] text-xs leading-relaxed mb-3 line-clamp-2">{post.content}</p>
       )}
 
       {/* Media */}
       {post.media_url && (
-        <div className="w-full rounded-xl overflow-hidden mb-3 bg-white/[0.04]">
+        <div className="w-full rounded-xl overflow-hidden mb-3 bg-[var(--bg-hover)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={post.media_url} alt="Post media" className="w-full max-h-64 object-cover" />
         </div>
@@ -76,23 +74,23 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
 
       {/* Meta + actions */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-600 text-xs">{timeAgo(post.created_at ?? new Date().toISOString())}</span>
+        <span className="text-[var(--text-3)] text-xs">{timeAgo(post.created_at ?? new Date().toISOString())}</span>
 
         <div className="flex items-center gap-0.5">
           {/* Votes */}
           <div className="flex items-center gap-1 mr-2">
             <button
               onClick={() => handleVote(1)}
-              className={`p-1 rounded-lg transition-all hover:bg-white/[0.06] ${vote === 1 ? "text-orange-400" : "text-gray-600 hover:text-orange-400"}`}
+              className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === 1 ? "text-orange-400" : "text-[var(--text-3)] hover:text-orange-400"}`}
             >
               <ArrowUp size={13} strokeWidth={2.5} />
             </button>
-            <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-gray-500"}`}>
+            <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-[var(--text-3)]"}`}>
               {formatCount(total)}
             </span>
             <button
               onClick={() => handleVote(-1)}
-              className={`p-1 rounded-lg transition-all hover:bg-white/[0.06] ${vote === -1 ? "text-blue-400" : "text-gray-600 hover:text-blue-400"}`}
+              className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === -1 ? "text-blue-400" : "text-[var(--text-3)] hover:text-blue-400"}`}
             >
               <ArrowDown size={13} strokeWidth={2.5} />
             </button>
@@ -100,7 +98,7 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
 
           <Link
             href={`/post/${post.id}`}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[var(--text-3)] text-xs hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all"
           >
             <MessageSquare size={12} />
             {post.comment.length}
@@ -108,7 +106,7 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[var(--text-3)] text-xs hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all"
           >
             <Share2 size={12} />
           </button>
@@ -128,10 +126,10 @@ function ProfilePostCard({ post }: { post: FeedPost }) {
 /* ─── Skeleton ─── */
 function PostSkeleton() {
   return (
-    <div className="border-b border-white/[0.06] px-5 py-4 animate-pulse space-y-2">
-      <div className="w-3/4 h-4 bg-white/[0.06] rounded" />
-      <div className="w-full h-3 bg-white/[0.06] rounded" />
-      <div className="w-1/2 h-3 bg-white/[0.06] rounded" />
+    <div className="border-b border-[var(--border)] px-5 py-4 animate-pulse space-y-2">
+      <div className="w-3/4 h-4 bg-[var(--bg-hover)] rounded" />
+      <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+      <div className="w-1/2 h-3 bg-[var(--bg-hover)] rounded" />
     </div>
   );
 }
@@ -154,14 +152,14 @@ function FollowModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-2xl border border-white/[0.1] overflow-hidden"
-        style={{ background: "#0d1020" }}
+        className="w-full max-w-sm rounded-2xl border border-[var(--border)] overflow-hidden"
+        style={{ background: "var(--bg-sidebar)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07]">
-          <p className="text-white font-bold text-sm">{title}</p>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+          <p className="text-[var(--text-1)] font-bold text-sm">{title}</p>
+          <button onClick={onClose} className="text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
             <X size={16} />
           </button>
         </div>
@@ -172,10 +170,10 @@ function FollowModal({
             <div className="flex flex-col gap-0">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 py-3 animate-pulse">
-                  <div className="w-9 h-9 rounded-full bg-white/[0.07] flex-shrink-0" />
+                  <div className="w-9 h-9 rounded-full bg-[var(--bg-hover)] flex-shrink-0" />
                   <div className="flex-1 space-y-1.5">
-                    <div className="w-28 h-3 bg-white/[0.07] rounded" />
-                    <div className="w-40 h-2.5 bg-white/[0.05] rounded" />
+                    <div className="w-28 h-3 bg-[var(--bg-hover)] rounded" />
+                    <div className="w-40 h-2.5 bg-[var(--bg-hover)] rounded" />
                   </div>
                 </div>
               ))}
@@ -183,7 +181,7 @@ function FollowModal({
           )}
 
           {!loading && users.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-10">Nobody here yet.</p>
+            <p className="text-[var(--text-3)] text-sm text-center py-10">Nobody here yet.</p>
           )}
 
           {!loading && users.map((u) => (
@@ -191,7 +189,7 @@ function FollowModal({
               key={u.id}
               href={`/profile/${u.username}`}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-hover)] transition-colors"
             >
               <div
                 className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
@@ -204,7 +202,7 @@ function FollowModal({
                 }
               </div>
               <div className="min-w-0">
-                <p className="text-white text-sm font-medium truncate">u/{u.username}</p>
+                <p className="text-[var(--text-1)] text-sm font-medium truncate">u/{u.username}</p>
               </div>
             </Link>
           ))}
@@ -296,7 +294,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Toaster position="top-center" theme="dark" richColors closeButton />
+      <Toaster position="top-center" richColors closeButton />
 
       {modal && (
         <FollowModal
@@ -307,7 +305,7 @@ export default function ProfilePage() {
         />
       )}
 
-      <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+      <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
         <Navbar />
 
         <div className="flex pt-14">
@@ -333,15 +331,15 @@ export default function ProfilePage() {
 
               {/* ── Profile header ── */}
               <div
-                className="border-b border-white/[0.06] px-5 pb-4"
-                style={{ background: "rgba(255,255,255,0.015)" }}
+                className="border-b border-[var(--border)] px-5 pb-4"
+                style={{ background: "var(--bg-card)" }}
               >
                 {/* Avatar row */}
                 <div className="flex items-end justify-between -mt-12 mb-3">
                   {/* Avatar */}
                   <div
-                    className="w-24 h-24 rounded-full border-4 border-[#0b0e1a] overflow-hidden flex items-center justify-center text-white text-3xl font-bold flex-shrink-0"
-                    style={avatarUrl ? undefined : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+                    className="w-24 h-24 rounded-full border-4 overflow-hidden flex items-center justify-center text-white text-3xl font-bold flex-shrink-0"
+                    style={{ borderColor: "var(--bg-base)", ...(avatarUrl ? {} : { background: "linear-gradient(135deg, #7c3aed, #a855f7)" }) }}
                   >
                     {avatarUrl
                       // eslint-disable-next-line @next/next/no-img-element
@@ -354,13 +352,13 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2 mt-14">
                     <Link
                       href="/profile/edit"
-                      className="px-4 py-1.5 rounded-full text-sm font-semibold text-white border border-white/20 hover:bg-white/[0.08] transition-all"
+                      className="px-4 py-1.5 rounded-full text-sm font-semibold text-[var(--text-1)] border border-[var(--border)] hover:bg-[var(--bg-hover)] transition-all"
                     >
                       Edit Profile
                     </Link>
                     <Link
                       href="/settings"
-                      className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-gray-400 hover:bg-white/[0.08] transition-all"
+                      className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--text-3)] hover:bg-[var(--bg-hover)] transition-all"
                     >
                       <Settings size={15} />
                     </Link>
@@ -369,35 +367,35 @@ export default function ProfilePage() {
 
                 {/* Name + handle */}
                 <div className="mb-3">
-                  <p className="text-white font-bold text-xl leading-tight">{displayName || "—"}</p>
-                  <p className="text-gray-500 text-sm">@{username || displayName || "—"}</p>
+                  <p className="text-[var(--text-1)] font-bold text-xl leading-tight">{displayName || "—"}</p>
+                  <p className="text-[var(--text-3)] text-sm">@{username || displayName || "—"}</p>
                 </div>
 
                 {/* Stats */}
                 <div className="flex items-center gap-5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-white text-sm font-bold">{posts.length}</span>
-                    <span className="text-gray-500 text-sm">posts</span>
+                    <span className="text-[var(--text-1)] text-sm font-bold">{posts.length}</span>
+                    <span className="text-[var(--text-3)] text-sm">posts</span>
                   </div>
                   <button
                     onClick={() => openModal("followers")}
                     className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                   >
-                    <span className="text-white text-sm font-bold">{followersCount}</span>
-                    <span className="text-gray-500 text-sm">followers</span>
+                    <span className="text-[var(--text-1)] text-sm font-bold">{followersCount}</span>
+                    <span className="text-[var(--text-3)] text-sm">followers</span>
                   </button>
                   <button
                     onClick={() => openModal("following")}
                     className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                   >
-                    <span className="text-white text-sm font-bold">{followingCount}</span>
-                    <span className="text-gray-500 text-sm">following</span>
+                    <span className="text-[var(--text-1)] text-sm font-bold">{followingCount}</span>
+                    <span className="text-[var(--text-3)] text-sm">following</span>
                   </button>
                 </div>
               </div>
 
               {/* ── Tabs ── */}
-              <div className="flex border-b border-white/[0.06]" style={{ background: "rgba(255,255,255,0.015)" }}>
+              <div className="flex border-b border-[var(--border)]" style={{ background: "var(--bg-card)" }}>
                 {TABS.map((tab) => (
                   <button
                     key={tab.key}
@@ -405,7 +403,7 @@ export default function ProfilePage() {
                     className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${
                       activeTab === tab.key
                         ? "border-purple-500 text-purple-300"
-                        : "border-transparent text-gray-600 hover:text-gray-400"
+                        : "border-transparent text-[var(--text-3)] hover:text-[var(--text-2)]"
                     }`}
                   >
                     {tab.label}
@@ -414,13 +412,13 @@ export default function ProfilePage() {
               </div>
 
               {/* ── Posts feed ── */}
-              <div style={{ background: "rgba(255,255,255,0.015)" }}>
+              <div style={{ background: "var(--bg-card)" }}>
                 {activeTab === "posts" && (
                   loading ? (
                     Array.from({ length: 4 }).map((_, i) => <PostSkeleton key={i} />)
                   ) : posts.length === 0 ? (
                     <div className="py-20 text-center">
-                      <p className="text-gray-500 text-sm">No posts yet.</p>
+                      <p className="text-[var(--text-3)] text-sm">No posts yet.</p>
                       <Link
                         href="/create-post"
                         className="mt-3 inline-block px-5 py-2 rounded-full text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all"
@@ -435,7 +433,7 @@ export default function ProfilePage() {
 
                 {(activeTab === "saved" || activeTab === "tagged") && (
                   <div className="py-20 text-center">
-                    <p className="text-gray-500 text-sm">Coming soon.</p>
+                    <p className="text-[var(--text-3)] text-sm">Coming soon.</p>
                   </div>
                 )}
               </div>

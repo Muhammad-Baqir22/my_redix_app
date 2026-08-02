@@ -73,7 +73,7 @@ function CommentItem({
   };
 
   return (
-    <div className={`${depth > 0 ? "ml-5 border-l border-white/[0.06] pl-4" : ""}`}>
+    <div className={`${depth > 0 ? "ml-5 border-l border-[var(--border)] pl-4" : ""}`}>
       <div className="py-3">
         {/* Meta */}
         <div className="flex items-center gap-2 mb-1.5">
@@ -81,32 +81,32 @@ function CommentItem({
             {comment.username.charAt(0).toUpperCase()}
           </div>
           <span className="text-purple-300 text-xs font-semibold">u/{comment.username}</span>
-          <span className="text-gray-600 text-xs">{timeAgo(comment.created_at)}</span>
+          <span className="text-[var(--text-3)] text-xs">{timeAgo(comment.created_at)}</span>
         </div>
 
         {/* Content */}
-        <p className="text-gray-300 text-sm leading-relaxed mb-2">{comment.content}</p>
+        <p className="text-[var(--text-2)] text-sm leading-relaxed mb-2">{comment.content}</p>
 
         {/* Actions */}
         <div className="flex items-center gap-1 -ml-1">
           <button
             onClick={() => handleVote(1)}
-            className={`p-1.5 rounded-lg text-xs transition-all hover:bg-white/[0.06] ${vote === 1 ? "text-orange-400" : "text-gray-600 hover:text-orange-400"}`}
+            className={`p-1.5 rounded-lg text-xs transition-all hover:bg-[var(--bg-hover)] ${vote === 1 ? "text-orange-400" : "text-[var(--text-3)] hover:text-orange-400"}`}
           >
             <ArrowUp size={13} strokeWidth={2.5} />
           </button>
-          <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-gray-500"}`}>
+          <span className={`text-xs font-bold ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-[var(--text-3)]"}`}>
             {formatCount(total)}
           </span>
           <button
             onClick={() => handleVote(-1)}
-            className={`p-1.5 rounded-lg text-xs transition-all hover:bg-white/[0.06] ${vote === -1 ? "text-blue-400" : "text-gray-600 hover:text-blue-400"}`}
+            className={`p-1.5 rounded-lg text-xs transition-all hover:bg-[var(--bg-hover)] ${vote === -1 ? "text-blue-400" : "text-[var(--text-3)] hover:text-blue-400"}`}
           >
             <ArrowDown size={13} strokeWidth={2.5} />
           </button>
           <button
             onClick={() => setReplying((v) => !v)}
-            className="ml-1 flex items-center gap-1 px-2.5 py-1 rounded-lg text-gray-600 text-xs hover:bg-white/[0.06] hover:text-gray-300 transition-all"
+            className="ml-1 flex items-center gap-1 px-2.5 py-1 rounded-lg text-[var(--text-3)] text-xs hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all"
           >
             <MessageSquare size={12} />
             Reply
@@ -121,7 +121,7 @@ function CommentItem({
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Write a reply…"
               rows={2}
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2 text-white text-sm placeholder-gray-600 resize-none focus:outline-none focus:border-purple-500/50 transition-colors"
+              className="flex-1 bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-3 py-2 text-[var(--text-1)] text-sm placeholder-[var(--text-3)] resize-none focus:outline-none focus:border-purple-500/50 transition-colors"
             />
             <button
               onClick={submitReply}
@@ -152,12 +152,12 @@ function CommentItem({
 function PostDetailSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="w-2/3 h-7 bg-white/[0.06] rounded-lg" />
-      <div className="w-24 h-3 bg-white/[0.06] rounded" />
+      <div className="w-2/3 h-7 bg-[var(--bg-hover)] rounded-lg" />
+      <div className="w-24 h-3 bg-[var(--bg-hover)] rounded" />
       <div className="space-y-2">
-        <div className="w-full h-3 bg-white/[0.06] rounded" />
-        <div className="w-5/6 h-3 bg-white/[0.06] rounded" />
-        <div className="w-4/6 h-3 bg-white/[0.06] rounded" />
+        <div className="w-full h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-5/6 h-3 bg-[var(--bg-hover)] rounded" />
+        <div className="w-4/6 h-3 bg-[var(--bg-hover)] rounded" />
       </div>
     </div>
   );
@@ -237,7 +237,7 @@ export default function PostPage() {
   const color = post?.name ? communityColor(post.name) : "#7c3aed";
 
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
@@ -250,7 +250,7 @@ export default function PostPage() {
             <p className="text-red-400 font-medium">{error}</p>
             <button
               onClick={loadPost}
-              className="px-4 py-2 rounded-xl text-sm text-white border border-white/[0.1] hover:bg-white/[0.05] transition-all"
+              className="px-4 py-2 rounded-xl text-sm text-[var(--text-1)] border border-[var(--border)] hover:bg-[var(--bg-hover)] transition-all"
             >
               Retry
             </button>
@@ -259,8 +259,8 @@ export default function PostPage() {
           <div className="flex flex-col gap-5">
             {/* Post card */}
             <article
-              className="rounded-2xl border border-white/[0.07] p-5"
-              style={{ background: "rgba(255,255,255,0.025)" }}
+              className="rounded-2xl border border-[var(--border)] p-5"
+              style={{ background: "var(--bg-card)" }}
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -272,57 +272,57 @@ export default function PostPage() {
                     >
                       {post.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-white text-xs font-semibold">r/{post.name}</span>
-                    <span className="text-gray-700 text-xs">•</span>
+                    <span className="text-[var(--text-1)] text-xs font-semibold">r/{post.name}</span>
+                    <span className="text-[var(--text-3)] text-xs">•</span>
                   </>
                 )}
-                <span className="text-gray-500 text-xs">
+                <span className="text-[var(--text-3)] text-xs">
                   by <span className="hover:text-purple-400 cursor-pointer">u/{post.username}</span>
                 </span>
               </div>
 
               {/* Title */}
-              <h1 className="text-white text-xl font-bold leading-snug mb-3">{post.title}</h1>
+              <h1 className="text-[var(--text-1)] text-xl font-bold leading-snug mb-3">{post.title}</h1>
 
               {/* Body */}
               {post.content && (
-                <p className="text-gray-300 text-sm leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
+                <p className="text-[var(--text-2)] text-sm leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
               )}
 
               {/* Media */}
               {post.media_url && (
-                <div className="w-full rounded-xl mb-4 overflow-hidden bg-white/[0.04]">
+                <div className="w-full rounded-xl mb-4 overflow-hidden bg-[var(--bg-hover)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={post.media_url} alt="Post media" className="w-full object-cover" />
                 </div>
               )}
 
               {/* Vote + share bar */}
-              <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
-                <div className="flex items-center gap-1.5 bg-white/[0.04] rounded-xl px-2 py-1">
+              <div className="flex items-center gap-2 pt-3 border-t border-[var(--border)]">
+                <div className="flex items-center gap-1.5 bg-[var(--bg-input)] rounded-xl px-2 py-1">
                   <button
                     onClick={() => handleVote(1)}
-                    className={`p-1 rounded-lg transition-all hover:bg-white/[0.08] ${vote === 1 ? "text-orange-400" : "text-gray-500 hover:text-orange-400"}`}
+                    className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === 1 ? "text-orange-400" : "text-[var(--text-3)] hover:text-orange-400"}`}
                   >
                     <ArrowUp size={15} strokeWidth={2.5} />
                   </button>
-                  <span className={`text-xs font-bold min-w-[28px] text-center ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-gray-400"}`}>
+                  <span className={`text-xs font-bold min-w-[28px] text-center ${vote === 1 ? "text-orange-400" : vote === -1 ? "text-blue-400" : "text-[var(--text-3)]"}`}>
                     {formatCount(voteTotal)}
                   </span>
                   <button
                     onClick={() => handleVote(-1)}
-                    className={`p-1 rounded-lg transition-all hover:bg-white/[0.08] ${vote === -1 ? "text-blue-400" : "text-gray-500 hover:text-blue-400"}`}
+                    className={`p-1 rounded-lg transition-all hover:bg-[var(--bg-hover)] ${vote === -1 ? "text-blue-400" : "text-[var(--text-3)] hover:text-blue-400"}`}
                   >
                     <ArrowDown size={15} strokeWidth={2.5} />
                   </button>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] text-gray-500 text-xs">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--bg-input)] text-[var(--text-3)] text-xs">
                   <MessageSquare size={13} />
                   {comments.length} Comments
                 </div>
                 <button
                   onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] text-gray-500 text-xs hover:text-gray-300 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--bg-input)] text-[var(--text-3)] text-xs hover:text-[var(--text-2)] transition-colors"
                 >
                   <Share2 size={13} />
                   Share
@@ -332,16 +332,16 @@ export default function PostPage() {
 
             {/* Comment box */}
             <div
-              className="rounded-2xl border border-white/[0.07] p-4"
-              style={{ background: "rgba(255,255,255,0.025)" }}
+              className="rounded-2xl border border-[var(--border)] p-4"
+              style={{ background: "var(--bg-card)" }}
             >
-              <p className="text-white text-sm font-semibold mb-3">Add a comment</p>
+              <p className="text-[var(--text-1)] text-sm font-semibold mb-3">Add a comment</p>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="What are your thoughts?"
                 rows={3}
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 resize-none focus:outline-none focus:border-purple-500/50 transition-colors mb-3"
+                className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-1)] text-sm placeholder-[var(--text-3)] resize-none focus:outline-none focus:border-purple-500/50 transition-colors mb-3"
               />
               <div className="flex justify-end">
                 <button
@@ -362,10 +362,10 @@ export default function PostPage() {
             {/* Comments */}
             {comments.length > 0 && (
               <div
-                className="rounded-2xl border border-white/[0.07] px-5"
-                style={{ background: "rgba(255,255,255,0.025)" }}
+                className="rounded-2xl border border-[var(--border)] px-5"
+                style={{ background: "var(--bg-card)" }}
               >
-                <p className="text-white text-sm font-semibold py-3 border-b border-white/[0.06]">
+                <p className="text-[var(--text-1)] text-sm font-semibold py-3 border-b border-[var(--border)]">
                   {comments.length} {comments.length === 1 ? "Comment" : "Comments"}
                 </p>
                 {comments.map((c) => (

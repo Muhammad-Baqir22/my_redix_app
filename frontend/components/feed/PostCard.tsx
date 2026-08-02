@@ -73,23 +73,23 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
 
   return (
     <article
-      className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] hover:border-purple-500/20 transition-all duration-200 group"
-      style={{ background: "rgba(255,255,255,0.025)" }}
+      className="flex gap-4 p-4 rounded-2xl border border-[var(--border)] hover:border-purple-500/20 transition-all duration-200 group"
+      style={{ background: "var(--bg-card)" }}
     >
       {/* Vote column */}
       <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
         <button
           onClick={() => handleVote(1)}
           aria-label="Upvote"
-          className={`p-1.5 rounded-lg transition-all duration-150 hover:bg-white/[0.08] ${
-            userVote === 1 ? "text-orange-400" : "text-gray-500 hover:text-orange-400"
+          className={`p-1.5 rounded-lg transition-all duration-150 hover:bg-[var(--bg-hover)] ${
+            userVote === 1 ? "text-orange-400" : "text-[var(--text-3)] hover:text-orange-400"
           }`}
         >
           <ArrowUp size={17} strokeWidth={2.5} />
         </button>
         <span
           className={`text-xs font-bold min-w-[32px] text-center leading-none ${
-            userVote === 1 ? "text-orange-400" : userVote === -1 ? "text-blue-400" : "text-gray-400"
+            userVote === 1 ? "text-orange-400" : userVote === -1 ? "text-blue-400" : "text-[var(--text-3)]"
           }`}
         >
           {formatCount(total)}
@@ -97,8 +97,8 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
         <button
           onClick={() => handleVote(-1)}
           aria-label="Downvote"
-          className={`p-1.5 rounded-lg transition-all duration-150 hover:bg-white/[0.08] ${
-            userVote === -1 ? "text-blue-400" : "text-gray-500 hover:text-blue-400"
+          className={`p-1.5 rounded-lg transition-all duration-150 hover:bg-[var(--bg-hover)] ${
+            userVote === -1 ? "text-blue-400" : "text-[var(--text-3)] hover:text-blue-400"
           }`}
         >
           <ArrowDown size={17} strokeWidth={2.5} />
@@ -117,13 +117,13 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
               >
                 {post.subreddit_name.charAt(0).toUpperCase()}
               </div>
-              <Link href={`/community/${post.subreddit_name}`} className="text-white text-xs font-semibold hover:text-purple-300 transition-colors">
+              <Link href={`/community/${post.subreddit_name}`} className="text-[var(--text-1)] text-xs font-semibold hover:text-purple-400 transition-colors">
                 r/{post.subreddit_name}
               </Link>
-              <span className="text-gray-700 text-xs">•</span>
+              <span className="text-[var(--text-3)] text-xs">•</span>
             </>
           )}
-          <span className="text-gray-500 text-xs">
+          <span className="text-[var(--text-3)] text-xs">
             by{" "}
             <Link href={`/profile/${post.username}`} className="hover:text-purple-400 transition-colors">
               u/{post.username}
@@ -133,23 +133,23 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
 
         {/* Title */}
         <Link href={`/post/${post.id}`}>
-          <h2 className="text-white text-base font-bold leading-snug mb-2 group-hover:text-purple-100 transition-colors">
+          <h2 className="text-[var(--text-1)] text-base font-bold leading-snug mb-2 group-hover:text-purple-500 transition-colors">
             {post.title}
           </h2>
         </Link>
 
         {/* Body */}
         {post.content && (
-          <p className="text-gray-400 text-sm leading-relaxed mb-3 line-clamp-3">
+          <p className="text-[var(--text-2)] text-sm leading-relaxed mb-3 line-clamp-3">
             {post.content}
           </p>
         )}
 
         {/* Media */}
         {post.media_url && (
-          <div className="w-full h-52 rounded-xl mb-3 overflow-hidden bg-white/[0.04]">
+          <div className="w-full rounded-xl mb-3 overflow-hidden bg-[var(--bg-hover)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.media_url} alt="Post media" className="w-full h-full object-cover" />
+            <img src={post.media_url} alt="Post media" className="w-full object-contain max-h-[32rem]" />
           </div>
         )}
 
@@ -157,14 +157,14 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
         <div className="flex items-center gap-0.5 mt-1 -ml-1.5 relative">
           <Link
             href={`/post/${post.id}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-500 text-xs font-medium hover:bg-white/[0.07] hover:text-gray-300 transition-all duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[var(--text-3)] text-xs font-medium hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all duration-150"
           >
             <MessageSquare size={14} />
             {post.comment.length} Comments
           </Link>
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-500 text-xs font-medium hover:bg-white/[0.07] hover:text-gray-300 transition-all duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[var(--text-3)] text-xs font-medium hover:bg-[var(--bg-hover)] hover:text-[var(--text-2)] transition-all duration-150"
           >
             <Share2 size={14} />
             Share
@@ -189,7 +189,7 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
                 setSavingInProgress(false);
               }
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-white/[0.07] transition-all duration-150 ${saved ? "text-purple-400" : "text-gray-500 hover:text-gray-300"}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[var(--bg-hover)] transition-all duration-150 ${saved ? "text-purple-400" : "text-[var(--text-3)] hover:text-[var(--text-2)]"}`}
           >
             <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
             {saved ? "Saved" : "Save"}
@@ -200,14 +200,14 @@ export default function PostCard({ post, initialSaved = false, isAdmin = false }
             <div ref={menuRef} className="ml-auto relative">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-white/[0.07] transition-all duration-150"
+                className="p-1.5 rounded-lg text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-[var(--bg-hover)] transition-all duration-150"
               >
                 <MoreHorizontal size={15} />
               </button>
               {menuOpen && (
                 <div
-                  className="absolute right-0 bottom-full mb-1 w-36 rounded-xl border border-white/[0.1] overflow-hidden shadow-xl shadow-black/50 z-20"
-                  style={{ background: "#141728" }}
+                  className="absolute right-0 bottom-full mb-1 w-36 rounded-xl border border-[var(--border)] overflow-hidden shadow-xl shadow-black/50 z-20"
+                  style={{ background: "var(--bg-elevated)" }}
                 >
                   <button
                     onClick={handleDelete}

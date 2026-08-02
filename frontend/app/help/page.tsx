@@ -31,22 +31,19 @@ const FAQS = [
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div
-      className="rounded-2xl border border-white/[0.07] overflow-hidden"
-      style={{ background: "rgba(255,255,255,0.025)" }}
-    >
+    <div className="rounded-2xl border border-[var(--border)] overflow-hidden" style={{ background: "var(--bg-card)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--bg-hover)] transition-colors"
       >
-        <span className="text-white font-medium text-sm">{q}</span>
+        <span className="text-[var(--text-1)] font-medium text-sm">{q}</span>
         <ChevronDown
           size={16}
-          className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`text-[var(--text-3)] flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
       {open && (
-        <div className="px-5 pb-4 text-gray-400 text-sm border-t border-white/[0.05] pt-3">
+        <div className="px-5 pb-4 text-[var(--text-2)] text-sm border-t border-[var(--border)] pt-3">
           {a}
         </div>
       )}
@@ -56,7 +53,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen" style={{ background: "#0b0e1a" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Navbar />
       <div className="flex pt-14">
         <LeftSidebar />
@@ -65,7 +62,7 @@ export default function HelpPage() {
 
             <div className="mb-8 flex items-center gap-3">
               <MessageCircle size={20} className="text-purple-400" />
-              <h1 className="text-white font-bold text-2xl">Help & Support</h1>
+              <h1 className="text-[var(--text-1)] font-bold text-2xl">Help & Support</h1>
             </div>
 
             {/* Contact card */}
@@ -78,8 +75,8 @@ export default function HelpPage() {
                 <Mail size={20} className="text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-white font-semibold text-sm mb-1">Contact Support</p>
-                <p className="text-gray-400 text-sm mb-2">
+                <p className="text-[var(--text-1)] font-semibold text-sm mb-1">Contact Support</p>
+                <p className="text-[var(--text-2)] text-sm mb-2">
                   Have a question or found a bug? Reach out and we'll respond as soon as possible.
                 </p>
                 <a
@@ -93,8 +90,8 @@ export default function HelpPage() {
 
             {/* FAQ */}
             <div className="flex items-center gap-2 mb-4">
-              <FileText size={16} className="text-gray-400" />
-              <h2 className="text-white font-semibold text-base">Frequently Asked Questions</h2>
+              <FileText size={16} className="text-[var(--text-3)]" />
+              <h2 className="text-[var(--text-1)] font-semibold text-base">Frequently Asked Questions</h2>
             </div>
             <div className="flex flex-col gap-3">
               {FAQS.map((faq, i) => (
