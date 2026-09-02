@@ -28,6 +28,7 @@ app.use(cors({
   exposedHeaders: ['Authorization'],
   methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
 }));
+app.options('*', cors());
 app.use(express.json());
 
 app.use('/api/users', userRouter);
