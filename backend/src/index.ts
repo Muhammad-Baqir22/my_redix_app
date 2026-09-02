@@ -11,34 +11,23 @@ import uploadRouter from './routes/upload.router';
 import chatRoutes from "./routes/chat.router";
 import savedpostRouter from "./routes/savedpost.router";
 import './mqtt/mqttClient'
-import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:3000'];
-
 app.use((req: any, res: any, next: any) => {
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
+  if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   }
-  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
   next();
 });
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  exposedHeaders: ['Authorization'],
-  methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
-}));
 app.use(express.json());
 
 app.use('/api/users', userRouter);
