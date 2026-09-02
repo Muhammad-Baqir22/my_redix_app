@@ -22,7 +22,17 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : ['http://localhost:3000'];
 
-app.options('/{*path}', cors({ origin: allowedOrigins, credentials: true }));
+app.use((req: any, res: any, next: any) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
