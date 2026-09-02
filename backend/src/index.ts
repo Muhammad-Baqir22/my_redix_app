@@ -22,13 +22,11 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : ['http://localhost:3000'];
 
-const corsOptions = {
+app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   exposedHeaders: ['Authorization'],
-};
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+}));
 app.use(express.json());
 
 app.use('/api/users', userRouter);
